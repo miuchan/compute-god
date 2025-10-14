@@ -10,6 +10,7 @@
   <a href="#features">Features</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#concepts">Concepts</a> •
+  <a href="#buidl">BUIDL</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#examples">Examples</a> •
   <a href="#roadmap">Roadmap</a> •
@@ -109,6 +110,14 @@ print(result.state["term"])
 * **Rewriter（重写器）**：以项重写/约束传播/归约为核心的变换器。
 
 > 数学片段：若 `F: X -> X` 在完备偏序上 **单调**，`⊥` 为最小元，则 Kleene 链 `⊥, F⊥, F²⊥, ...` 的并为 `F` 的最小不动点。Compute‑God 提供 `Monotone(F)` 辅助与 `ChainBuilder`。
+
+---
+
+## BUIDL
+
+> 「BUIDL」图将 Compute‑God 的运行拆分为五个可以嵌套的宇宙，并在母宇宙中统一调度。若无法查看图像，可阅读文字版说明。
+
+* [BUIDL 宇宙图谱（含母宇宙说明）](docs/buidl-universes.md)
 
 ---
 
