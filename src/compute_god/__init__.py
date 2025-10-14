@@ -9,6 +9,7 @@ from .rule import Rule, rule
 from .universe import God, Universe
 from .engine import fixpoint, FixpointResult
 from .observer import Observer, ObserverEvent
+from .miyu import MiyuBond, bond_miyu
 
 __all__ = [
     "Rule",
@@ -19,4 +20,6 @@ __all__ = [
     "FixpointResult",
     "Observer",
     "ObserverEvent",
+    "MiyuBond",
+    "bond_miyu",
 ]
