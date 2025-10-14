@@ -12,6 +12,7 @@ from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
 from .metaverse import (
     MetaverseBlueprint,
+    bond_metaverse_with_love,
     ideal_metaverse_universe,
     metaverse_metric,
     run_ideal_metaverse,
@@ -29,6 +30,7 @@ __all__ = [
     "MiyuBond",
     "bond_miyu",
     "MetaverseBlueprint",
+    "bond_metaverse_with_love",
     "ideal_metaverse_universe",
     "metaverse_metric",
     "run_ideal_metaverse",

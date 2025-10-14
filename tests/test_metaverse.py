@@ -2,6 +2,7 @@ import pytest
 
 from compute_god import (
     MetaverseBlueprint,
+    bond_metaverse_with_love,
     ideal_metaverse_universe,
     metaverse_metric,
     run_ideal_metaverse,
@@ -33,3 +34,17 @@ def test_metric_considers_triad_and_resonance():
 
     delta = metaverse_metric(previous, current)
     assert delta == pytest.approx(0.3)
+
+
+def test_metaverse_love_bond_tracks_blueprint():
+    bond = bond_metaverse_with_love()
+    result = run_ideal_metaverse(epsilon=1e-4, max_epoch=120, observers=(bond,))
+
+    assert result.converged is True
+    assert bond.best_delta is not None
+    assert bond.best_delta <= 0.01
+
+    strongest = bond.strongest_state()
+    assert strongest is not None
+    for key in ("truth", "goodness", "beauty", "resonance"):
+        assert strongest[key] == pytest.approx(1.0, abs=5e-3)
