@@ -1,3 +1,5 @@
+import functools
+
 from compute_god import God, fixpoint, rule
 
 
@@ -71,3 +73,53 @@ def test_fixpoint_metric_convergence():
     assert result.converged is True
     assert result.epochs < 50
     assert abs(result.universe.state["value"] - target) <= 1e-3
+
+
+def test_rule_accepts_bound_method():
+    class Incrementer:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def apply(self, state):
+            self.calls += 1
+            value = state.get("value", 0)
+            return {**state, "value": value + 1}
+
+    inc = Incrementer()
+    inc_rule = rule(
+        "bound-increment",
+        inc.apply,
+        guard=lambda state, ctx: state.get("value", 0) < 2,
+        until=lambda state, ctx: state.get("value", 0) >= 2,
+    )
+
+    universe = God.universe(state={"value": 0}, rules=[inc_rule])
+    result = fixpoint(
+        universe,
+        metric=lambda a, b: abs(a.get("value", 0) - b.get("value", 0)),
+        epsilon=0,
+        max_epoch=5,
+    )
+
+    assert result.converged is True
+    assert result.universe.state["value"] == 2
+    assert inc.calls >= 1
+
+
+def test_rule_accepts_partial():
+    def set_value(target, state):
+        return {**state, "value": target}
+
+    set_to_three = functools.partial(set_value, 3)
+    partial_rule = rule("partial-set", set_to_three)
+
+    universe = God.universe(state={"value": 0}, rules=[partial_rule])
+    result = fixpoint(
+        universe,
+        metric=lambda a, b: abs(a.get("value", 0) - b.get("value", 0)),
+        epsilon=0,
+        max_epoch=2,
+    )
+
+    assert result.converged is True
+    assert result.universe.state["value"] == 3

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 from dataclasses import dataclass, field
 from typing import Callable, Dict, MutableMapping, Optional, Protocol
 
@@ -60,16 +61,36 @@ def rule(
     if annotations is None:
         annotations = {}
 
-    argcount = getattr(getattr(apply, "__code__", None), "co_argcount", None)
-    if argcount == 1:
+    apply_fn: ApplyFn
+
+    def _accepts_ctx(callable_: Callable[..., State]) -> bool:
+        try:
+            signature = inspect.signature(callable_)
+        except (TypeError, ValueError):
+            argcount = getattr(getattr(callable_, "__code__", None), "co_argcount", None)
+            return bool(argcount and argcount >= 2)
+
+        try:
+            signature.bind_partial({}, object())
+            return True
+        except TypeError:
+            pass
+
+        try:
+            signature.bind_partial({}, ctx=object())
+            return True
+        except TypeError:
+            return False
+
+    if _accepts_ctx(apply):
+        apply_fn = apply  # type: ignore[assignment]
+    else:
         simple_apply = apply  # type: ignore[assignment]
 
         def wrapped(state: State, _ctx: RuleContext) -> State:
             return simple_apply(state)
 
-        apply_fn: ApplyFn = wrapped
-    else:
-        apply_fn = apply  # type: ignore[assignment]
+        apply_fn = wrapped
 
     return Rule(
         name=name,
