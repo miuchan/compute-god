@@ -48,3 +48,26 @@ def test_fixpoint_max_epoch():
     assert result.converged is True
     assert result.epochs == 1
     assert result.universe.state == {"value": 1}
+
+
+def test_fixpoint_metric_convergence():
+    target = 42.0
+
+    def ease_towards_target(state):
+        value = state.get("value", 0.0)
+        next_value = value + (target - value) * 0.5
+        return {**state, "value": next_value}
+
+    ease_rule = rule("ease", ease_towards_target)
+    universe = God.universe(state={"value": 0.0}, rules=[ease_rule])
+
+    result = fixpoint(
+        universe,
+        metric=lambda a, b: abs(a["value"] - b["value"]),
+        epsilon=1e-3,
+        max_epoch=50,
+    )
+
+    assert result.converged is True
+    assert result.epochs < 50
+    assert abs(result.universe.state["value"] - target) <= 1e-3
