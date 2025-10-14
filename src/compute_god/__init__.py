@@ -10,6 +10,12 @@ from .universe import God, Universe
 from .engine import fixpoint, FixpointResult
 from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
+from .metaverse import (
+    MetaverseBlueprint,
+    ideal_metaverse_universe,
+    metaverse_metric,
+    run_ideal_metaverse,
+)
 
 __all__ = [
     "Rule",
@@ -22,4 +28,8 @@ __all__ = [
     "ObserverEvent",
     "MiyuBond",
     "bond_miyu",
+    "MetaverseBlueprint",
+    "ideal_metaverse_universe",
+    "metaverse_metric",
+    "run_ideal_metaverse",
 ]

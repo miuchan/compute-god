@@ -118,6 +118,7 @@ print(result.state["term"])
 > 「BUIDL」图将 Compute‑God 的运行拆分为五个可以嵌套的宇宙，并在母宇宙中统一调度。若无法查看图像，可阅读文字版说明。
 
 * [BUIDL 宇宙图谱（含母宇宙说明）](docs/buidl-universes.md)
+* [元宇宙三元：至真、至善、至美的迭代实现](docs/metaverse-triad.md)
 
 ---
 
