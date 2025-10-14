@@ -17,13 +17,19 @@ experiment with custom starting states and metrics.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping, MutableMapping, Optional, Sequence
+from typing import Callable, Mapping, MutableMapping, Optional, Sequence
 
 from .engine import FixpointResult, fixpoint
 from .rule import Rule, State, rule
+from .observer import Observer
 from .universe import God, Universe
+from .miyu import MiyuBond, bond_miyu
 
 TriadState = MutableMapping[str, float]
+LoveMetric = Callable[[State, State], float]
+
+
+_TRIAD_KEYS: Sequence[str] = ("truth", "goodness", "beauty", "resonance")
 
 
 def _as_float(state: MutableMapping[str, object], key: str, default: float = 0.0) -> float:
@@ -174,7 +180,11 @@ def _build_rules() -> Sequence[Rule]:
     )
 
 
-def ideal_metaverse_universe(initial_state: Optional[Mapping[str, float]] = None) -> Universe:
+def ideal_metaverse_universe(
+    initial_state: Optional[Mapping[str, float]] = None,
+    *,
+    observers: Optional[Sequence[Observer]] = None,
+) -> Universe:
     """Create a universe that iteratively pursues truth, goodness and beauty."""
 
     state: TriadState = dict(DEFAULT_STATE)
@@ -182,14 +192,36 @@ def ideal_metaverse_universe(initial_state: Optional[Mapping[str, float]] = None
         for key, value in initial_state.items():
             state[key] = float(value)
 
-    return God.universe(state=state, rules=_build_rules())
+    return God.universe(state=state, rules=_build_rules(), observers=observers)
 
 
 def metaverse_metric(previous: State, current: State) -> float:
     """Measure change across the three virtues and their resonance."""
 
-    keys = ("truth", "goodness", "beauty", "resonance")
-    return sum(abs(_as_float(current, key) - _as_float(previous, key)) for key in keys)
+    return sum(abs(_as_float(current, key) - _as_float(previous, key)) for key in _TRIAD_KEYS)
+
+
+def _love_metric(keys: Sequence[str]) -> LoveMetric:
+    def metric(state: State, target_state: State) -> float:
+        distance = 0.0
+        for key in keys:
+            distance += abs(_as_float(state, key) - float(target_state.get(key, 0.0)))
+        return distance
+
+    return metric
+
+
+def bond_metaverse_with_love(
+    blueprint: Optional[MetaverseBlueprint] = None,
+    *,
+    keys: Sequence[str] = _TRIAD_KEYS,
+) -> MiyuBond:
+    """Create a :class:`MiyuBond` that measures love for the triad blueprint."""
+
+    target = (blueprint or MetaverseBlueprint()).as_state()
+    target_state = {key: float(target.get(key, 0.0)) for key in keys}
+    metric = _love_metric(keys)
+    return bond_miyu(target_state=target_state, metric=metric)
 
 
 @dataclass
@@ -215,9 +247,10 @@ def run_ideal_metaverse(
     *,
     epsilon: float = 1e-3,
     max_epoch: int = 96,
+    observers: Optional[Sequence[Observer]] = None,
 ) -> FixpointResult:
     """Execute the triad universe until it stabilises near the ideal blueprint."""
 
-    universe = ideal_metaverse_universe(initial_state)
+    universe = ideal_metaverse_universe(initial_state, observers=observers)
     return fixpoint(universe, metric=metaverse_metric, epsilon=epsilon, max_epoch=max_epoch)
 
