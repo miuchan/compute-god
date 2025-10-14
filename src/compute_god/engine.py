@@ -18,22 +18,33 @@ class FixpointResult:
 
 
 class _EpochContext:
-    def __init__(self, *, observer: Observer, metric: Metric, epsilon: float) -> None:
+    def __init__(
+        self,
+        *,
+        observer: Observer,
+        metric: Metric,
+        epsilon: float,
+        initial_state: State,
+    ) -> None:
         self._observer = observer
         self._metric = metric
         self._epsilon = epsilon
-        self._last_state: Optional[State] = None
+        self._previous_state: State = dict(initial_state)
 
-    def record(self, state: State) -> None:
-        if self._last_state is None:
-            self._last_state = dict(state)
-            return
-        delta = self._metric(self._last_state, state)
-        self._last_state = dict(state)
+    def record(self, state: State, *, epoch: int) -> bool:
+        delta = self._metric(self._previous_state, state)
+        self._previous_state = dict(state)
         if delta <= self._epsilon:
-            self._observer(ObserverEvent.FIXPOINT_CONVERGED, state, delta=delta)
-        else:
-            self._observer(ObserverEvent.EPOCH, state, delta=delta)
+            self._observer(
+                ObserverEvent.FIXPOINT_CONVERGED,
+                state,
+                epoch=epoch,
+                delta=delta,
+            )
+            return True
+
+        self._observer(ObserverEvent.EPOCH, state, epoch=epoch, delta=delta)
+        return False
 
 
 def _clone_state(state: State) -> State:
@@ -68,16 +79,18 @@ def fixpoint(
     ctx = God.rule_context()
     if observer is None:
         observer = combine_observers(*universe.observers)
-    epoch_ctx = _EpochContext(observer=observer, metric=metric, epsilon=epsilon)
+    epoch_ctx = _EpochContext(
+        observer=observer,
+        metric=metric,
+        epsilon=epsilon,
+        initial_state=universe.state,
+    )
 
     for epoch in range(1, max_epoch + 1):
         new_state = _apply_rules(universe, ctx, observer)
-        observer(ObserverEvent.EPOCH, new_state, epoch=epoch)
-        epoch_ctx.record(new_state)
-        if new_state == universe.state:
-            observer(ObserverEvent.FIXPOINT_CONVERGED, new_state, epoch=epoch)
-            return FixpointResult(universe=Universe(new_state, universe.rules, universe.observers), converged=True, epochs=epoch)
         universe = Universe(new_state, universe.rules, universe.observers)
+        if epoch_ctx.record(new_state, epoch=epoch):
+            return FixpointResult(universe=universe, converged=True, epochs=epoch)
 
     observer(ObserverEvent.FIXPOINT_MAXED, universe.state, epoch=max_epoch)
     return FixpointResult(universe=universe, converged=False, epochs=max_epoch)
