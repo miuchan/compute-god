@@ -116,6 +116,7 @@ from .adhd import (
     simulate_coe,
 )
 from .logic import Feizi, Ouzi, 非子, 欧子
+from .utawarerumono import LegendChant, Utawarerumono, UtawarerumonoChant, 传颂之物
 from .world import WorldExecutionRequest, world_execute
 
 __all__ = [
@@ -248,6 +249,10 @@ __all__ = [
     "Ouzi",
     "非子",
     "欧子",
+    "Utawarerumono",
+    "UtawarerumonoChant",
+    "LegendChant",
+    "传颂之物",
     "WorldExecutionRequest",
     "world_execute",
 ]
