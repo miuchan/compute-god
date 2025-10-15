@@ -11,6 +11,15 @@ from .engine import fixpoint, FixpointResult
 from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
 from .bingzi import Bingzi, 冰子
+from .abura_soba import (
+    AburaSobaProfile,
+    NoodleCanvas,
+    OilLayer,
+    TareBlend,
+    Topping,
+    assemble_abura_soba,
+    油そば,
+)
 from .entangle import (
     Chanzi,
     Entangler,
@@ -78,6 +87,13 @@ __all__ = [
     "bond_miyu",
     "Bingzi",
     "冰子",
+    "AburaSobaProfile",
+    "NoodleCanvas",
+    "OilLayer",
+    "TareBlend",
+    "Topping",
+    "assemble_abura_soba",
+    "油そば",
     "Jiuzi",
     "Chanzi",
     "Entangler",
