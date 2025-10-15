@@ -34,50 +34,144 @@ def _ensure_finite(values: Iterable[float]) -> None:
             raise ValueError("segment values must be finite")
 
 
-def _project_onto_simplex(values: Sequence[float], total: float) -> Vector:
-    """Project ``values`` onto the simplex ``{x >= 0, sum(x) = total}``."""
+def _project_onto_bounded_simplex(
+    values: Sequence[float],
+    total: float,
+    lower_bounds: Sequence[float],
+    upper_bounds: Sequence[float],
+    *,
+    tolerance: float = 1e-9,
+    max_iter: int = 128,
+) -> Vector:
+    """Project ``values`` onto ``{x | lower <= x <= upper, sum(x) = total}``."""
 
     if total <= 0:
         raise _ProjectionError("total must be positive when projecting")
     if not values:
         raise _ProjectionError("at least one segment is required to project")
 
+    if not (len(values) == len(lower_bounds) == len(upper_bounds)):
+        raise _ProjectionError("dimension mismatch in projection")
+
     _ensure_finite(values)
+    _ensure_finite(lower_bounds)
 
-    # Algorithm adapted from "Efficient Projections onto the l1-Ball for
-    # Learning in High Dimensions" by Duchi et al.  The values are sorted in
-    # descending order to find the appropriate threshold.
-    sorted_values = sorted(values, reverse=True)
-    cumulative = 0.0
-    rho = 0
-    theta = 0.0
+    # ``upper_bounds`` may contain infinities; filter them lazily when needed.
+    for low, high in zip(lower_bounds, upper_bounds):
+        if high < low:
+            raise _ProjectionError("upper bound must be at least as large as lower bound")
 
-    for idx, value in enumerate(sorted_values, 1):
-        cumulative += value
-        candidate = (cumulative - total) / idx
-        if value - candidate > 0:
-            rho = idx
-            theta = candidate
+    lower_sum = sum(lower_bounds)
+    if lower_sum > total + tolerance:
+        raise _ProjectionError("total is incompatible with lower bounds")
 
-    if rho == 0:
-        # All values are effectively zero or negative; fall back to a uniform
-        # distribution on the simplex.
-        uniform = total / len(values)
-        return [uniform for _ in values]
+    finite_upper = [high for high in upper_bounds if math.isfinite(high)]
+    if finite_upper and sum(finite_upper) < total - tolerance:
+        raise _ProjectionError("total exceeds the sum of finite upper bounds")
 
-    theta = (sum(sorted_values[:rho]) - total) / rho
-    projected = [max(v - theta, 0.0) for v in values]
+    def clip_with_lambda(lagrange: float) -> Vector:
+        clipped: Vector = []
+        for value, low, high in zip(values, lower_bounds, upper_bounds):
+            projected = value - lagrange
+            if projected < low:
+                projected = low
+            elif projected > high:
+                projected = high
+            clipped.append(projected)
+        return clipped
 
-    # Numerical drift might cause the sum to differ slightly from ``total``.
-    projected_sum = sum(projected)
-    if projected_sum == 0:
-        uniform = total / len(values)
-        projected = [uniform for _ in values]
+    def sum_with_lambda(lagrange: float) -> tuple[float, Vector]:
+        clipped = clip_with_lambda(lagrange)
+        return sum(clipped), clipped
+
+    lambda_low_candidates = [
+        value - high
+        for value, high in zip(values, upper_bounds)
+        if math.isfinite(high)
+    ]
+    if lambda_low_candidates:
+        lambda_low = min(lambda_low_candidates)
     else:
-        scale = total / projected_sum
-        projected = [v * scale for v in projected]
+        lambda_low = min(values) - total
 
-    return projected
+    lambda_high = max(value - low for value, low in zip(values, lower_bounds))
+
+    sum_low, projected_low = sum_with_lambda(lambda_low)
+    adjust_iter = 0
+    while sum_low < total and adjust_iter < max_iter:
+        step = max(1.0, abs(lambda_low))
+        lambda_low -= step
+        sum_low, projected_low = sum_with_lambda(lambda_low)
+        adjust_iter += 1
+    if sum_low < total - tolerance:
+        raise _ProjectionError("failed to bracket projection from below")
+
+    sum_high, projected_high = sum_with_lambda(lambda_high)
+    adjust_iter = 0
+    while sum_high > total and adjust_iter < max_iter:
+        step = max(1.0, abs(lambda_high))
+        lambda_high += step
+        sum_high, projected_high = sum_with_lambda(lambda_high)
+        adjust_iter += 1
+    if sum_high > total + tolerance:
+        raise _ProjectionError("failed to bracket projection from above")
+
+    projected = projected_low
+    for _ in range(max_iter):
+        lambda_mid = 0.5 * (lambda_low + lambda_high)
+        projected = clip_with_lambda(lambda_mid)
+        current_sum = sum(projected)
+
+        if abs(current_sum - total) <= tolerance:
+            break
+
+        if current_sum > total:
+            lambda_low = lambda_mid
+        else:
+            lambda_high = lambda_mid
+
+    current_sum = sum(projected)
+    correction = total - current_sum
+    if abs(correction) > tolerance:
+        free_indices = [
+            idx
+            for idx, (value, low, high) in enumerate(
+                zip(projected, lower_bounds, upper_bounds)
+            )
+            if low < value < high
+        ]
+
+        if not free_indices:
+            for idx in range(len(projected)):
+                if abs(correction) <= tolerance:
+                    break
+                low, high = lower_bounds[idx], upper_bounds[idx]
+                capacity = (high - projected[idx]) if correction > 0 else (projected[idx] - low)
+                capacity = max(capacity, 0.0)
+                delta = max(min(correction, capacity), -capacity)
+                projected[idx] += delta
+                correction -= delta
+        else:
+            adjustment = correction / len(free_indices)
+            for idx in free_indices:
+                projected[idx] += adjustment
+
+    final_vector = [
+        min(max(value, low), high)
+        for value, low, high in zip(projected, lower_bounds, upper_bounds)
+    ]
+
+    final_sum = sum(final_vector)
+    if abs(final_sum - total) > 1e-6:  # pragma: no cover - defensive
+        raise _ProjectionError("projection failed to satisfy affine constraint")
+
+    return final_vector
+
+
+def _project_onto_simplex(values: Sequence[float], total: float) -> Vector:
+    lower = [0.0 for _ in values]
+    upper = [math.inf for _ in values]
+    return _project_onto_bounded_simplex(values, total, lower, upper)
 
 
 Objective = Callable[[Sequence[float]], tuple[float, Sequence[float]]]
@@ -99,7 +193,11 @@ class ClosedTimelikeCurve:
 
     segments: Sequence[float]
     period: float
+    lower_bounds: Optional[Sequence[float]] = None
+    upper_bounds: Optional[Sequence[float]] = None
     _vector: Vector = field(init=False, repr=False)
+    _lower_bounds: Vector = field(init=False, repr=False)
+    _upper_bounds: List[float] = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         if self.period <= 0:
@@ -114,11 +212,50 @@ class ClosedTimelikeCurve:
 
         scale = self.period / total
         self._vector = [max(value * scale, 0.0) for value in self.segments]
+
+        dimension = len(self.segments)
+        lower = (
+            list(self.lower_bounds)
+            if self.lower_bounds is not None
+            else [0.0 for _ in range(dimension)]
+        )
+        upper = (
+            list(self.upper_bounds)
+            if self.upper_bounds is not None
+            else [math.inf for _ in range(dimension)]
+        )
+
+        if len(lower) != dimension or len(upper) != dimension:
+            raise ValueError("bounds must match the number of segments")
+
+        _ensure_finite(lower)
+        for value in upper:
+            if not math.isfinite(value) and not math.isinf(value):
+                raise ValueError("upper bounds must be finite or infinity")
+
+        for low, high in zip(lower, upper):
+            if high < low:
+                raise ValueError("upper bound must exceed lower bound")
+
+        lower_sum = sum(lower)
+        if lower_sum > self.period + 1e-9:
+            raise ValueError("period is incompatible with provided lower bounds")
+
+        finite_upper = [value for value in upper if math.isfinite(value)]
+        if finite_upper and sum(finite_upper) < self.period - 1e-9:
+            raise ValueError("period exceeds the sum of finite upper bounds")
+
+        self._lower_bounds = lower
+        self._upper_bounds = upper
         self._renormalise()
 
     def _renormalise(self) -> None:
-        projected = _project_onto_simplex(self._vector, self.period)
-        self._vector = projected
+        self._vector = self._project(self._vector)
+
+    def _project(self, values: Sequence[float]) -> Vector:
+        return _project_onto_bounded_simplex(
+            values, self.period, self._lower_bounds, self._upper_bounds
+        )
 
     @property
     def dimension(self) -> int:
@@ -130,6 +267,18 @@ class ClosedTimelikeCurve:
         """Return a defensive copy of the current segment weights."""
 
         return list(self._vector)
+
+    @property
+    def lower(self) -> Vector:
+        """Return defensive copy of the lower bounds."""
+
+        return list(self._lower_bounds)
+
+    @property
+    def upper(self) -> List[float]:
+        """Return defensive copy of the upper bounds."""
+
+        return list(self._upper_bounds)
 
     def update(self, values: Sequence[float]) -> None:
         """Replace the segment weights and renormalise onto the simplex."""
@@ -198,7 +347,7 @@ def optimise_closed_timelike_curve(
     if projection is None:
 
         def projection(values: Sequence[float]) -> Vector:  # type: ignore[redefinition]
-            return _project_onto_simplex(values, curve.period)
+            return curve._project(values)
 
     converged = False
     objective_value = math.inf

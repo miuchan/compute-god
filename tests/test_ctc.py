@@ -55,3 +55,33 @@ def test_ctc_convex_optimisation_respects_simplex():
     vector = curve.as_vector()
     assert math.isclose(sum(vector), 2.0, rel_tol=1e-8, abs_tol=1e-8)
     assert all(value >= 0 for value in vector)
+
+
+def test_ctc_bounded_projection_respects_limits():
+    curve = ClosedTimelikeCurve(
+        segments=[0.6, 0.3, 0.1],
+        period=1.2,
+        lower_bounds=[0.2, 0.1, 0.1],
+        upper_bounds=[0.7, 0.5, 0.4],
+    )
+
+    target = [0.5, 0.6, 0.1]
+
+    result = optimise_closed_timelike_curve(
+        curve,
+        quadratic_objective(target),
+        learning_rate=0.2,
+        max_iter=256,
+        tolerance=1e-7,
+    )
+
+    assert result.converged is True
+
+    vector = curve.as_vector()
+    assert math.isclose(sum(vector), 1.2, rel_tol=1e-8, abs_tol=1e-8)
+    for value, low, high in zip(vector, [0.2, 0.1, 0.1], [0.7, 0.5, 0.4]):
+        assert low - 1e-9 <= value <= high + 1e-9
+
+    # The target for the second segment exceeds its upper bound, so the
+    # optimiser should saturate it at the provided limit.
+    assert math.isclose(vector[1], 0.5, rel_tol=1e-8, abs_tol=1e-8)
