@@ -117,6 +117,15 @@ from .adhd import (
 )
 from .logic import Feizi, Ouzi, 非子, 欧子
 from .utawarerumono import LegendChant, Utawarerumono, UtawarerumonoChant, 传颂之物
+from .love_wishing_machine import (
+    WishParameters,
+    love_wishing_fixpoint,
+    love_wishing_map,
+    love_wishing_metric,
+    love_wishing_rule,
+    love_wishing_universe,
+    wish_granted,
+)
 from .world import WorldExecutionRequest, world_execute
 
 __all__ = [
@@ -186,6 +195,13 @@ __all__ = [
     "StabilityWitness",
     "存在子",
     "稳定子",
+    "WishParameters",
+    "love_wishing_fixpoint",
+    "love_wishing_map",
+    "love_wishing_metric",
+    "love_wishing_rule",
+    "love_wishing_universe",
+    "wish_granted",
     "ClosedTimelikeCurve",
     "CTCOptimisationResult",
     "optimise_closed_timelike_curve",
