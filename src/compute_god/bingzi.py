@@ -82,5 +82,79 @@ class Bingzi:
 冰子 = Bingzi
 
 
-__all__ = ["Bingzi", "冰子"]
+@dataclass
+class Pingzi:
+    """Observer that tracks the hottest state encountered so far.
+
+    ``Pingzi`` mirrors :class:`Bingzi` but focuses on heat instead of cold.  It
+    records the *maximum* value reported by its temperature metric together with
+    a snapshot of the corresponding state.  Once a value at or above the
+    ``boil_point`` is seen the observer is considered overheated.
+
+    Parameters
+    ----------
+    metric:
+        Callable returning a temperature-like measure for a state.  Larger
+        values are considered hotter.
+    boil_point:
+        Threshold above which the observer is considered overheated.  Defaults
+        to ``100.0`` mirroring the boiling point of water in Celsius.
+    """
+
+    metric: TemperatureMetric
+    boil_point: float = 100.0
+    history: List[Tuple[ObserverEvent, float]] = field(default_factory=list, init=False)
+    hottest_value: Optional[float] = field(default=None, init=False)
+    _hottest_state: Optional[State] = field(default=None, init=False, repr=False)
+
+    def __call__(self, event: ObserverEvent, state: State, /, **metadata: object) -> None:
+        """Record ``state`` together with its evaluated temperature."""
+
+        temperature = float(self.metric(state))
+        self.history.append((event, temperature))
+
+        if self.hottest_value is None or temperature > self.hottest_value:
+            self.hottest_value = temperature
+            self._hottest_state = dict(state)
+
+    @property
+    def is_overheated(self) -> bool:
+        """Return ``True`` once a temperature at or above ``boil_point`` is seen."""
+
+        return self.hottest_value is not None and self.hottest_value >= self.boil_point
+
+    def hottest_state(self) -> Optional[State]:
+        """Return a defensive copy of the hottest state encountered so far."""
+
+        if self._hottest_state is None:
+            return None
+        return dict(self._hottest_state)
+
+    def reset(self) -> None:
+        """Clear recorded information so the observer can be reused."""
+
+        self.history.clear()
+        self.hottest_value = None
+        self._hottest_state = None
+
+
+def peculiar_asymmetry(bingzi: Bingzi, pingzi: Pingzi) -> Optional[float]:
+    """Return the temperature gap between ``Bingzi`` and ``Pingzi``.
+
+    The helper captures the "奇异性" (peculiarity) between cold and hot
+    observations.  ``None`` is returned until both observers have recorded at
+    least one value.
+    """
+
+    if bingzi.coldest_value is None or pingzi.hottest_value is None:
+        return None
+    return float(pingzi.hottest_value - bingzi.coldest_value)
+
+
+# Chinese aliases so users can embrace the playful API surface.
+冰子 = Bingzi
+瓶子 = Pingzi
+
+
+__all__ = ["Bingzi", "Pingzi", "peculiar_asymmetry", "冰子", "瓶子"]
 

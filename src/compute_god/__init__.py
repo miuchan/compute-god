@@ -10,7 +10,7 @@ from .universe import God, Universe
 from .engine import fixpoint, FixpointResult
 from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
-from .bingzi import Bingzi, 冰子
+from .bingzi import Bingzi, Pingzi, peculiar_asymmetry, 冰子, 瓶子
 from .abura_soba import (
     AburaSobaProfile,
     NoodleCanvas,
@@ -86,7 +86,10 @@ __all__ = [
     "MiyuBond",
     "bond_miyu",
     "Bingzi",
+    "Pingzi",
+    "peculiar_asymmetry",
     "冰子",
+    "瓶子",
     "AburaSobaProfile",
     "NoodleCanvas",
     "OilLayer",
