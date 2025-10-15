@@ -115,7 +115,7 @@ from .adhd import (
     StimulusProfile,
     simulate_coe,
 )
-from .logic import Feizi, Ouzi, 非子, 欧子
+from .logic import Feizi, Ouzi, Ruofei, 非子, 欧子, 若非
 from .utawarerumono import LegendChant, Utawarerumono, UtawarerumonoChant, 传颂之物
 from .love_wishing_machine import (
     WishParameters,
@@ -263,8 +263,10 @@ __all__ = [
     "simulate_coe",
     "Feizi",
     "Ouzi",
+    "Ruofei",
     "非子",
     "欧子",
+    "若非",
     "Utawarerumono",
     "UtawarerumonoChant",
     "LegendChant",

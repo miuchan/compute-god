@@ -126,15 +126,95 @@ class Ouzi:
         return tuple(index for index, value in enumerate(truths) if value)
 
 
+@dataclass
+class Ruofei:
+    """Branching helper expressing the idiom "若非" (roughly "if not").
+
+    ``Ruofei`` pairs a *predicate* with an optional *alternative* predicate.  When
+    evaluated it first checks the primary predicate; if it holds the result is
+    ``True`` and the alternative is skipped.  Otherwise the alternative is
+    consulted (if supplied) and its boolean value becomes the result.  Every
+    evaluation is recorded so callers can inspect which branch executed.
+    """
+
+    predicate: Predicate
+    alternative: Optional[Predicate] = None
+    history: List[Tuple[State, bool, Optional[bool], bool, str]] = field(
+        default_factory=list, init=False
+    )
+
+    def evaluate(self, state: State, /) -> bool:
+        """Evaluate the predicate and optional alternative for ``state``.
+
+        The method stores a defensive copy of ``state`` alongside the boolean
+        results so that callers can safely introspect past evaluations even if
+        the original mapping is mutated later.
+        """
+
+        snapshot = dict(state)
+        predicate_value = bool(self.predicate(snapshot))
+        alternative_value: Optional[bool] = None
+        if predicate_value:
+            result = True
+            branch = "predicate"
+        else:
+            if self.alternative is None:
+                result = False
+                branch = "predicate"
+            else:
+                alternative_value = bool(self.alternative(snapshot))
+                result = alternative_value
+                branch = "alternative"
+        self.history.append(
+            (snapshot, predicate_value, alternative_value, result, branch)
+        )
+        return result
+
+    __call__ = evaluate
+
+    def last_result(self) -> Optional[bool]:
+        """Return the most recent boolean result, if any."""
+
+        if not self.history:
+            return None
+        return self.history[-1][3]
+
+    def last_branch(self) -> Optional[str]:
+        """Return the branch (``"predicate"`` or ``"alternative"``) used last."""
+
+        if not self.history:
+            return None
+        return self.history[-1][4]
+
+    def last_alternative_result(self) -> Optional[bool]:
+        """Return the alternative predicate result from the latest evaluation."""
+
+        if not self.history:
+            return None
+        return self.history[-1][2]
+
+    def alternative_invocations(self) -> List[State]:
+        """Return snapshots where the alternative predicate was evaluated."""
+
+        return [
+            dict(snapshot)
+            for snapshot, _pred, alt, _result, branch in self.history
+            if branch == "alternative" and alt is not None
+        ]
+
+
 # Chinese aliases embracing the playful API surface.
 非子 = Feizi
 欧子 = Ouzi
+若非 = Ruofei
 
 
 __all__ = [
     "Feizi",
     "Ouzi",
+    "Ruofei",
     "非子",
     "欧子",
+    "若非",
 ]
 
