@@ -10,6 +10,7 @@ from .universe import God, Universe
 from .engine import fixpoint, FixpointResult
 from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
+from .ctc import ClosedTimelikeCurve, CTCOptimisationResult, optimise_closed_timelike_curve
 from .metaverse import (
     MetaverseBlueprint,
     bond_metaverse_with_love,
@@ -29,6 +30,9 @@ __all__ = [
     "ObserverEvent",
     "MiyuBond",
     "bond_miyu",
+    "ClosedTimelikeCurve",
+    "CTCOptimisationResult",
+    "optimise_closed_timelike_curve",
     "MetaverseBlueprint",
     "bond_metaverse_with_love",
     "ideal_metaverse_universe",
