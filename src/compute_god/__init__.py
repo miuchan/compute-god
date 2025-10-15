@@ -97,6 +97,7 @@ from .adhd import (
     simulate_coe,
 )
 from .logic import Feizi, Ouzi, 非子, 欧子
+from .world import WorldExecutionRequest, world_execute
 
 __all__ = [
     "Rule",
@@ -213,4 +214,6 @@ __all__ = [
     "Ouzi",
     "非子",
     "欧子",
+    "WorldExecutionRequest",
+    "world_execute",
 ]
