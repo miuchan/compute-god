@@ -126,6 +126,12 @@ from .love_wishing_machine import (
     love_wishing_universe,
     wish_granted,
 )
+from .courtship_cohomology import (
+    CochainSpace,
+    CourtshipCochainComplex,
+    CourtshipDifferential,
+    courtship_cohomology_story,
+)
 from .world import WorldExecutionRequest, world_execute
 
 __all__ = [
@@ -202,6 +208,10 @@ __all__ = [
     "love_wishing_rule",
     "love_wishing_universe",
     "wish_granted",
+    "CochainSpace",
+    "CourtshipCochainComplex",
+    "CourtshipDifferential",
+    "courtship_cohomology_story",
     "ClosedTimelikeCurve",
     "CTCOptimisationResult",
     "optimise_closed_timelike_curve",
