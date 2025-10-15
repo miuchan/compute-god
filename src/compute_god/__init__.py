@@ -91,6 +91,7 @@ from .adhd import (
     StimulusProfile,
     simulate_coe,
 )
+from .logic import Feizi, Ouzi, 非子, 欧子
 
 __all__ = [
     "Rule",
@@ -184,4 +185,8 @@ __all__ = [
     "ADHDProfile",
     "CoefficientOfEngagement",
     "simulate_coe",
+    "Feizi",
+    "Ouzi",
+    "非子",
+    "欧子",
 ]

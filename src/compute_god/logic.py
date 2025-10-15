@@ -1,0 +1,140 @@
+"""Logical helpers affectionately referred to as :class:`非子` and :class:`欧子`.
+
+The project enjoys giving its utilities whimsical nicknames and the logical
+operators introduced here continue that tradition.  ``Feizi`` encapsulates the
+idea of logical negation applied to an arbitrary predicate over universe
+states.  ``Ouzi`` complements it by modelling a disjunction across multiple
+predicates.  Both helpers keep lightweight histories so that downstream code
+can inspect how the evaluations evolved over time without having to juggle
+additional bookkeeping.
+
+The goal is not to provide a fully fledged propositional calculus but rather a
+pair of ergonomic building blocks that can be composed with the existing
+observers and fixpoint machinery.  They are particularly handy when callers
+need to express simple guards or convergence criteria that mix negated
+conditions and disjunctive checks while still wanting insight into which
+branch fired.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Callable, List, MutableMapping, Optional, Sequence, Tuple
+
+State = MutableMapping[str, object]
+Predicate = Callable[[State], bool]
+
+
+@dataclass
+class Feizi:
+    """Negate a predicate over universe states while keeping evaluation history.
+
+    Parameters
+    ----------
+    predicate:
+        Callable receiving a state and returning ``True`` when the condition it
+        represents holds.  ``Feizi`` will negate that result so callers can work
+        with the logical complement without having to wrap the predicate
+        themselves.
+    """
+
+    predicate: Predicate
+    history: List[Tuple[State, bool]] = field(default_factory=list, init=False)
+
+    def evaluate(self, state: State, /) -> bool:
+        """Return the negated value of ``predicate`` for ``state``.
+
+        A defensive copy of ``state`` is stored alongside the result so that the
+        history remains stable even if the caller mutates the original mapping
+        after evaluation.
+        """
+
+        snapshot = dict(state)
+        result = not bool(self.predicate(snapshot))
+        self.history.append((snapshot, result))
+        return result
+
+    __call__ = evaluate
+
+    def last_result(self) -> Optional[bool]:
+        """Return the most recent negated result, if any."""
+
+        if not self.history:
+            return None
+        return self.history[-1][1]
+
+    def contradictions(self) -> List[State]:
+        """Return snapshots where the underlying predicate evaluated to ``False``."""
+
+        return [dict(snapshot) for snapshot, negated in self.history if negated]
+
+
+@dataclass
+class Ouzi:
+    """Disjunction helper that reports how multiple predicates evaluated.
+
+    Parameters
+    ----------
+    predicates:
+        Sequence of callables to evaluate for each observed state.  The
+        instance records the boolean value of every predicate together with the
+        resulting disjunction so callers can later reason about which branch
+        provided support.
+    """
+
+    predicates: Sequence[Predicate]
+    history: List[Tuple[State, Tuple[bool, ...], bool]] = field(
+        default_factory=list, init=False
+    )
+
+    def __post_init__(self) -> None:
+        self.predicates = tuple(self.predicates)
+        if not self.predicates:
+            raise ValueError("Ouzi requires at least one predicate")
+
+    def evaluate(self, state: State, /) -> bool:
+        """Return whether any predicate holds for ``state``."""
+
+        snapshot = dict(state)
+        evaluations = tuple(bool(predicate(snapshot)) for predicate in self.predicates)
+        result = any(evaluations)
+        self.history.append((snapshot, evaluations, result))
+        return result
+
+    __call__ = evaluate
+
+    def last_result(self) -> Optional[bool]:
+        """Return the boolean value of the most recent disjunction."""
+
+        if not self.history:
+            return None
+        return self.history[-1][2]
+
+    def last_truths(self) -> Optional[Tuple[bool, ...]]:
+        """Return the individual predicate values from the latest evaluation."""
+
+        if not self.history:
+            return None
+        return self.history[-1][1]
+
+    def supporting_indices(self) -> Optional[Tuple[int, ...]]:
+        """Return indices of predicates that evaluated to ``True`` most recently."""
+
+        truths = self.last_truths()
+        if truths is None:
+            return None
+        return tuple(index for index, value in enumerate(truths) if value)
+
+
+# Chinese aliases embracing the playful API surface.
+非子 = Feizi
+欧子 = Ouzi
+
+
+__all__ = [
+    "Feizi",
+    "Ouzi",
+    "非子",
+    "欧子",
+]
+
