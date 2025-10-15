@@ -166,7 +166,17 @@ def thermal_dual(machine: Jizi, submachine: Zijiji) -> Optional[ThermalDual]:
 机子 = Jizi
 子机机 = Zijiji
 热对偶 = thermal_dual
+自机子对偶 = thermal_dual
 
 
-__all__ = ["Jizi", "Zijiji", "ThermalDual", "thermal_dual", "机子", "子机机", "热对偶"]
+__all__ = [
+    "Jizi",
+    "Zijiji",
+    "ThermalDual",
+    "thermal_dual",
+    "机子",
+    "子机机",
+    "热对偶",
+    "自机子对偶",
+]
 
