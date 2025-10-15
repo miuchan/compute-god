@@ -133,6 +133,13 @@ from .love_wishing_machine import (
     wish_granted,
 )
 from .world import WorldExecutionRequest, world_execute
+from .shuangxiang import (
+    BiphasicOptimisationResult,
+    BiphasicState,
+    optimise_biphasic_state,
+    双相,
+    双相梯度下降,
+)
 
 __all__ = [
     "Rule",
@@ -283,4 +290,9 @@ __all__ = [
     "传颂之物",
     "WorldExecutionRequest",
     "world_execute",
+    "BiphasicState",
+    "BiphasicOptimisationResult",
+    "optimise_biphasic_state",
+    "双相",
+    "双相梯度下降",
 ]
