@@ -27,6 +27,7 @@ from .threshold import (
     ThresholdOptimisationResult,
     optimise_threshold_space,
 )
+from .degree_space import DegreeDual, DegreeSpace, DegreeTensor, tensor_product
 from .metaverse import (
     MetaverseBlueprint,
     bond_metaverse_with_love,
@@ -87,6 +88,10 @@ __all__ = [
     "ThresholdSpace",
     "ThresholdOptimisationResult",
     "optimise_threshold_space",
+    "DegreeSpace",
+    "DegreeDual",
+    "DegreeTensor",
+    "tensor_product",
     "MetaverseBlueprint",
     "bond_metaverse_with_love",
     "ideal_metaverse_universe",
