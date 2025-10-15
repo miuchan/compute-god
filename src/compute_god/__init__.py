@@ -84,6 +84,13 @@ from .elf_usdt import (
     精灵,
     泰达,
 )
+from .adhd import (
+    ADHDProfile,
+    ADHDResponse,
+    CoefficientOfEngagement,
+    StimulusProfile,
+    simulate_coe,
+)
 
 __all__ = [
     "Rule",
@@ -172,4 +179,9 @@ __all__ = [
     "USDT",
     "精灵",
     "泰达",
+    "StimulusProfile",
+    "ADHDResponse",
+    "ADHDProfile",
+    "CoefficientOfEngagement",
+    "simulate_coe",
 ]
