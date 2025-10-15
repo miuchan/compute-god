@@ -15,6 +15,7 @@ from .jizi import Jizi, ThermalDual, Zijiji, thermal_dual, 机子, 子机机, �
 from .bingzi import Bingzi, Pingzi, PingziRelation, peculiar_asymmetry, 冰子, 瓶子, 平子
 from .sanzi import Sanzi, SanziOverview, Weizi, 三子, 维子
 from .jiaose import ChromaticDual, Jiaozi, Sezi, chromatic_dual, 角子, 色子, 色角对偶
+from .august import EndlessAugust
 from .abura_soba import (
     AburaSobaProfile,
     NoodleCanvas,
@@ -116,6 +117,7 @@ __all__ = [
     "ObserverEvent",
     "MiyuBond",
     "bond_miyu",
+    "EndlessAugust",
     "Bingzi",
     "Pingzi",
     "PingziRelation",
