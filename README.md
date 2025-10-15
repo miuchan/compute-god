@@ -122,6 +122,7 @@ print(result.state["term"])
 * [实现共同富裕：Compute-God 的应用蓝图](docs/common-prosperity.md)
 * [元时空的存在性与稳定性证明](docs/meta-spacetime-proof.md)
 * [「万物演示」的物理化实现指南](docs/physical-everything-demonstration.md)
+* [药物实验室的设计与实现](docs/drug-lab-design-and-implementation.md)
 * [BUIDL in Public 宣言与执行节奏](docs/buidl-in-public.md)
 * [Heroism Universe：认清真相后依然热爱生活](docs/heroism-universe.md)
 
