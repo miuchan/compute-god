@@ -57,6 +57,12 @@ from .meta_spacetime import (
     meta_spacetime_metric,
     run_meta_spacetime,
 )
+from .complex_network import (
+    ComplexNetworkBlueprint,
+    complex_network_metric,
+    ideal_complex_network_universe,
+    run_complex_network,
+)
 from .everything_demonstration import (
     EverythingDemonstrationBlueprint,
     physical_everything_demonstration_universe,
@@ -180,6 +186,10 @@ __all__ = [
     "ideal_meta_spacetime_universe",
     "meta_spacetime_metric",
     "run_meta_spacetime",
+    "ComplexNetworkBlueprint",
+    "complex_network_metric",
+    "ideal_complex_network_universe",
+    "run_complex_network",
     "EverythingDemonstrationBlueprint",
     "physical_everything_demonstration_universe",
     "physical_everything_metric",
