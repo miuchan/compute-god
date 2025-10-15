@@ -13,6 +13,7 @@ from .miyu import MiyuBond, bond_miyu
 from .bingzi import Bingzi, Pingzi, peculiar_asymmetry, 冰子, 瓶子
 from .jizi import Jizi, ThermalDual, Zijiji, thermal_dual, 机子, 子机机, 热对偶
 from .bingzi import Bingzi, Pingzi, PingziRelation, peculiar_asymmetry, 冰子, 瓶子, 平子
+from .sanzi import Sanzi, SanziOverview, Weizi, 三子, 维子
 from .jiaose import ChromaticDual, Jiaozi, Sezi, chromatic_dual, 角子, 色子, 色角对偶
 from .abura_soba import (
     AburaSobaProfile,
@@ -110,6 +111,9 @@ __all__ = [
     "peculiar_asymmetry",
     "冰子",
     "瓶子",
+    "Sanzi",
+    "SanziOverview",
+    "Weizi",
     "Jiaozi",
     "Sezi",
     "ChromaticDual",
@@ -124,6 +128,8 @@ __all__ = [
     "机子",
     "子机机",
     "热对偶",
+    "三子",
+    "维子",
     "平子",
     "AburaSobaProfile",
     "NoodleCanvas",
