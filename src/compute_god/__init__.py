@@ -10,6 +10,15 @@ from .universe import God, Universe
 from .engine import fixpoint, FixpointResult
 from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
+from .entangle import (
+    Chanzi,
+    Entangler,
+    EntanglementSnapshot,
+    Jiuzi,
+    纠子,
+    缠子,
+    纠缠子,
+)
 from .ctc import ClosedTimelikeCurve, CTCOptimisationResult, optimise_closed_timelike_curve
 from .threshold import (
     ThresholdSpace,
@@ -35,6 +44,13 @@ __all__ = [
     "ObserverEvent",
     "MiyuBond",
     "bond_miyu",
+    "Jiuzi",
+    "Chanzi",
+    "Entangler",
+    "EntanglementSnapshot",
+    "纠子",
+    "缠子",
+    "纠缠子",
     "ClosedTimelikeCurve",
     "CTCOptimisationResult",
     "optimise_closed_timelike_curve",
