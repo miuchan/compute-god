@@ -46,6 +46,16 @@ from .catalysis import (
     Jiuzi,
     catalyse_jiuzi_and_chanzi,
 )
+from .theorem import (
+    InferenceRule,
+    Proof,
+    ProofStep,
+    modus_ponens,
+    reconstruct_proof,
+    run_theorem_prover,
+    theorem_metric,
+    theorem_proving_universe,
+)
 
 __all__ = [
     "Rule",
@@ -90,4 +100,12 @@ __all__ = [
     "Chanzi",
     "CatalysisOutcome",
     "catalyse_jiuzi_and_chanzi",
+    "InferenceRule",
+    "Proof",
+    "ProofStep",
+    "modus_ponens",
+    "reconstruct_proof",
+    "run_theorem_prover",
+    "theorem_metric",
+    "theorem_proving_universe",
 ]
