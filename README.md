@@ -120,6 +120,7 @@ print(result.state["term"])
 * [BUIDL 宇宙图谱（含母宇宙说明）](docs/buidl-universes.md)
 * [元宇宙三元：至真、至善、至美的迭代实现](docs/metaverse-triad.md)
 * [元时空的存在性与稳定性证明](docs/meta-spacetime-proof.md)
+* [「万物演示」的物理化实现指南](docs/physical-everything-demonstration.md)
 
 ---
 
