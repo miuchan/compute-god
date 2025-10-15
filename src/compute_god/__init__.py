@@ -12,6 +12,7 @@ from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
 from .bingzi import Bingzi, Pingzi, peculiar_asymmetry, 冰子, 瓶子
 from .jizi import Jizi, ThermalDual, Zijiji, thermal_dual, 机子, 子机机, 热对偶
+from .bingzi import Bingzi, Pingzi, PingziRelation, peculiar_asymmetry, 冰子, 瓶子, 平子
 from .abura_soba import (
     AburaSobaProfile,
     NoodleCanvas,
@@ -88,6 +89,7 @@ __all__ = [
     "bond_miyu",
     "Bingzi",
     "Pingzi",
+    "PingziRelation",
     "peculiar_asymmetry",
     "冰子",
     "瓶子",
@@ -98,6 +100,7 @@ __all__ = [
     "机子",
     "子机机",
     "热对偶",
+    "平子",
     "AburaSobaProfile",
     "NoodleCanvas",
     "OilLayer",

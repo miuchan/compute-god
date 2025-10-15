@@ -78,10 +78,6 @@ class Bingzi:
         self._coldest_state = None
 
 
-# Chinese alias so users can embrace the playful API surface.
-冰子 = Bingzi
-
-
 @dataclass
 class Pingzi:
     """Observer that tracks the hottest state encountered so far.
@@ -151,10 +147,63 @@ def peculiar_asymmetry(bingzi: Bingzi, pingzi: Pingzi) -> Optional[float]:
     return float(pingzi.hottest_value - bingzi.coldest_value)
 
 
+@dataclass
+class PingziRelation:
+    """Bridge capturing the relationship between :class:`Bingzi` and :class:`Pingzi`.
+
+    ``PingziRelation`` – nicknamed ``平子`` – keeps references to the cold and hot
+    observers so that callers can reason about their combined behaviour.  It can
+    report the observed temperature span, compute the mid-point ("equilibrium")
+    between the two extremes and offer a convenience check to see whether the
+    system has settled within an acceptable tolerance around that mid-point.
+    """
+
+    bingzi: Bingzi
+    pingzi: Pingzi
+
+    def has_extremes(self) -> bool:
+        """Return ``True`` when both observers have recorded at least one value."""
+
+        return self.bingzi.coldest_value is not None and self.pingzi.hottest_value is not None
+
+    def temperature_span(self) -> Optional[float]:
+        """Return the temperature gap spanned by ``Bingzi`` and ``Pingzi``."""
+
+        if not self.has_extremes():
+            return None
+        return peculiar_asymmetry(self.bingzi, self.pingzi)
+
+    def equilibrium(self) -> Optional[float]:
+        """Return the mid-point temperature between the recorded extremes."""
+
+        if not self.has_extremes():
+            return None
+        assert self.bingzi.coldest_value is not None  # for the type-checker
+        assert self.pingzi.hottest_value is not None
+        return float((self.bingzi.coldest_value + self.pingzi.hottest_value) / 2.0)
+
+    def is_balanced(self, *, tolerance: float = 0.0) -> bool:
+        """Check whether the equilibrium lies within ``tolerance`` of zero."""
+
+        midpoint = self.equilibrium()
+        if midpoint is None:
+            return False
+        return abs(midpoint) <= tolerance
+
+
 # Chinese aliases so users can embrace the playful API surface.
 冰子 = Bingzi
 瓶子 = Pingzi
+平子 = PingziRelation
 
 
-__all__ = ["Bingzi", "Pingzi", "peculiar_asymmetry", "冰子", "瓶子"]
+__all__ = [
+    "Bingzi",
+    "Pingzi",
+    "PingziRelation",
+    "peculiar_asymmetry",
+    "冰子",
+    "瓶子",
+    "平子",
+]
 
