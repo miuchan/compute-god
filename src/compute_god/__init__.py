@@ -32,6 +32,12 @@ from .metaverse import (
     metaverse_metric,
     run_ideal_metaverse,
 )
+from .catalysis import (
+    CatalysisOutcome,
+    Chanzi,
+    Jiuzi,
+    catalyse_jiuzi_and_chanzi,
+)
 
 __all__ = [
     "Rule",
@@ -62,4 +68,8 @@ __all__ = [
     "ideal_metaverse_universe",
     "metaverse_metric",
     "run_ideal_metaverse",
+    "Jiuzi",
+    "Chanzi",
+    "CatalysisOutcome",
+    "catalyse_jiuzi_and_chanzi",
 ]
