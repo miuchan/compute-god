@@ -11,6 +11,7 @@ from .engine import fixpoint, FixpointResult
 from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
 from .bingzi import Bingzi, Pingzi, peculiar_asymmetry, 冰子, 瓶子
+from .jizi import Jizi, ThermalDual, Zijiji, thermal_dual, 机子, 子机机, 热对偶
 from .abura_soba import (
     AburaSobaProfile,
     NoodleCanvas,
@@ -90,6 +91,13 @@ __all__ = [
     "peculiar_asymmetry",
     "冰子",
     "瓶子",
+    "Jizi",
+    "Zijiji",
+    "ThermalDual",
+    "thermal_dual",
+    "机子",
+    "子机机",
+    "热对偶",
     "AburaSobaProfile",
     "NoodleCanvas",
     "OilLayer",
