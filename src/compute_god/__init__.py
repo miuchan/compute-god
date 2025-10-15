@@ -11,6 +11,11 @@ from .engine import fixpoint, FixpointResult
 from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
 from .ctc import ClosedTimelikeCurve, CTCOptimisationResult, optimise_closed_timelike_curve
+from .threshold import (
+    ThresholdSpace,
+    ThresholdOptimisationResult,
+    optimise_threshold_space,
+)
 from .metaverse import (
     MetaverseBlueprint,
     bond_metaverse_with_love,
@@ -33,6 +38,9 @@ __all__ = [
     "ClosedTimelikeCurve",
     "CTCOptimisationResult",
     "optimise_closed_timelike_curve",
+    "ThresholdSpace",
+    "ThresholdOptimisationResult",
+    "optimise_threshold_space",
     "MetaverseBlueprint",
     "bond_metaverse_with_love",
     "ideal_metaverse_universe",
