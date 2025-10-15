@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from compute_god import Jizi, ObserverEvent, ThermalDual, Zijiji, 热对偶, 机子, 子机机
+from compute_god import Jizi, ObserverEvent, ThermalDual, Zijiji, 热对偶, 机子, 子机机, 自机子对偶
 
 
 def temperature_metric(state):
@@ -74,4 +74,5 @@ def test_thermal_dual_requires_both_observers() -> None:
 def test_chinese_aliases_match_primary_classes() -> None:
     assert 机子 is Jizi
     assert 子机机 is Zijiji
+    assert 自机子对偶 is 热对偶
 
