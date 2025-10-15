@@ -35,12 +35,9 @@ from .entangle import (
 )
 from .existence import ExistenceWitness, StabilityWitness, 存在子, 稳定子
 from .ctc import ClosedTimelikeCurve, CTCOptimisationResult, optimise_closed_timelike_curve
-from .threshold import (
-    ThresholdSpace,
-    ThresholdOptimisationResult,
-    optimise_threshold_space,
-)
+from .threshold import ThresholdSpace, ThresholdOptimisationResult, optimise_threshold_space
 from .life import LifeLattice, LifeOptimisationResult, optimise_game_of_life
+from .rule_optimisation import RuleOptimisationResult, optimise_rule_weights
 from .degree_space import DegreeDual, DegreeSpace, DegreeTensor, tensor_product
 from .metaverse import (
     MetaverseBlueprint,
@@ -160,6 +157,8 @@ __all__ = [
     "LifeLattice",
     "LifeOptimisationResult",
     "optimise_game_of_life",
+    "RuleOptimisationResult",
+    "optimise_rule_weights",
     "DegreeSpace",
     "DegreeDual",
     "DegreeTensor",
