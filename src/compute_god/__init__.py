@@ -14,6 +14,18 @@ from .bingzi import Bingzi, Pingzi, peculiar_asymmetry, 冰子, 瓶子
 from .jizi import Jizi, ThermalDual, Zijiji, thermal_dual, 机子, 子机机, 热对偶, 自机子对偶
 from .bingzi import Bingzi, Pingzi, PingziRelation, peculiar_asymmetry, 冰子, 瓶子, 平子
 from .sanzi import Sanzi, SanziOverview, Weizi, 三子, 维子
+from .siqianzi import (
+    Siqianzi,
+    SiqianziDualEdge,
+    SiqianziDualNode,
+    SiqianziThermalNetwork,
+    thermal_dual_network,
+    死前子,
+    死前子节点,
+    死前子连线,
+    死前子网络,
+    死前子热对偶网络,
+)
 from .jiaose import ChromaticDual, Jiaozi, Sezi, chromatic_dual, 角子, 色子, 色角对偶
 from .abura_soba import (
     AburaSobaProfile,
@@ -125,6 +137,11 @@ __all__ = [
     "Sanzi",
     "SanziOverview",
     "Weizi",
+    "Siqianzi",
+    "SiqianziDualNode",
+    "SiqianziDualEdge",
+    "SiqianziThermalNetwork",
+    "thermal_dual_network",
     "Jiaozi",
     "Sezi",
     "ChromaticDual",
@@ -143,6 +160,11 @@ __all__ = [
     "三子",
     "维子",
     "平子",
+    "死前子",
+    "死前子节点",
+    "死前子连线",
+    "死前子网络",
+    "死前子热对偶网络",
     "AburaSobaProfile",
     "NoodleCanvas",
     "OilLayer",
