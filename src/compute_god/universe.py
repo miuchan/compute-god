@@ -18,6 +18,13 @@ class Universe:
     def sorted_rules(self) -> List[Rule]:
         return sorted(self.rules, key=lambda r: r.priority, reverse=True)
 
+    def rules_by_role(self, role: Optional[str]) -> List[Rule]:
+        """Return the rules matching ``role`` ordered by priority."""
+
+        if role is None:
+            return self.sorted_rules()
+        return [rule for rule in self.sorted_rules() if rule.role == role]
+
 
 class _RuleContextImpl:
     def __init__(self) -> None:
