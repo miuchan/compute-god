@@ -41,6 +41,12 @@ from .meta_spacetime import (
     meta_spacetime_metric,
     run_meta_spacetime,
 )
+from .everything_demonstration import (
+    EverythingDemonstrationBlueprint,
+    physical_everything_demonstration_universe,
+    physical_everything_metric,
+    run_physical_everything_demonstration,
+)
 from .catalysis import (
     CatalysisOutcome,
     Chanzi,
@@ -101,6 +107,10 @@ __all__ = [
     "ideal_meta_spacetime_universe",
     "meta_spacetime_metric",
     "run_meta_spacetime",
+    "EverythingDemonstrationBlueprint",
+    "physical_everything_demonstration_universe",
+    "physical_everything_metric",
+    "run_physical_everything_demonstration",
     "Jiuzi",
     "Chanzi",
     "CatalysisOutcome",
