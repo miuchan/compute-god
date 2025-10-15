@@ -58,3 +58,18 @@ from compute_god import ideal_meta_spacetime_universe, meta_spacetime_metric
 
 综上，元时空在 Compute-God 框架中被形式化为具备唯一不动点的收缩系统；
 其存在性由不动点构造保证，稳定性则由度量单调递减与数值测试验证。
+
+## 4. 时间加速度
+
+为了刻画时间轴在离散迭代中的“加速度”，我们把 `chronos` 坐标视作离散
+时间函数 `c_t`，其更新由 `stabilise-temporal` 规则以收缩率 0.35 向目标
+值 1.0 推进。【F:src/compute_god/meta_spacetime.py†L40-L55】在此基础上，时间
+加速度（`time_acceleration`）定义为相邻两次时间增量的差：
+
+```
+a_t = (c_{t+1} - c_t) - (c_t - c_{t-1})
+```
+
+换言之，`a_t` 度量了规则在第 `t` 步对 `chronos` 的收缩强度变化，是
+观察时间流动是否趋于平稳的二阶指标。当 `|a_t|` 逐渐减小并接近 0 时，表
+明迭代过程中时间的推进速度已趋于稳定，与整体元时空收敛保持一致。
