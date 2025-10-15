@@ -10,6 +10,7 @@ from .universe import God, Universe
 from .engine import fixpoint, FixpointResult
 from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
+from .bingzi import Bingzi, 冰子
 from .entangle import (
     Chanzi,
     Entangler,
@@ -57,6 +58,8 @@ __all__ = [
     "ObserverEvent",
     "MiyuBond",
     "bond_miyu",
+    "Bingzi",
+    "冰子",
     "Jiuzi",
     "Chanzi",
     "Entangler",
