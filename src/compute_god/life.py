@@ -46,12 +46,17 @@ def _ensure_dimension(value: int, name: str) -> int:
     return value
 
 
-def _ensure_probability(value: float) -> float:
+def _ensure_finite(value: float) -> float:
     if not math.isfinite(value):
         raise ValueError("lattice values must be finite")
-    if value < 0.0 or value > 1.0:
-        raise ValueError("lattice values must lie within [0, 1]")
     return float(value)
+
+
+def _ensure_probability(value: float) -> float:
+    finite_value = _ensure_finite(value)
+    if finite_value < 0.0 or finite_value > 1.0:
+        raise ValueError("lattice values must lie within [0, 1]")
+    return finite_value
 
 
 def _to_vector(height: int, width: int, state: Optional[Sequence[Sequence[float]] | Sequence[float]]) -> Vector:
@@ -70,6 +75,27 @@ def _to_vector(height: int, width: int, state: Optional[Sequence[Sequence[float]
         if len(row) != width:  # type: ignore[arg-type]
             raise ValueError("two-dimensional initial state must match lattice width")
         vector.extend(_ensure_probability(float(value)) for value in row)  # type: ignore[arg-type]
+    return vector
+
+
+def _to_vector_unbounded(
+    height: int, width: int, state: Optional[Sequence[Sequence[float]] | Sequence[float]]
+) -> Vector:
+    size = height * width
+    if state is None:
+        return [0.0 for _ in range(size)]
+
+    if len(state) == size and not any(isinstance(value, Sequence) for value in state):
+        return [_ensure_finite(float(value)) for value in state]  # type: ignore[arg-type]
+
+    if len(state) != height:
+        raise ValueError("two-dimensional initial state must match lattice height")
+
+    vector: Vector = []
+    for row in state:  # type: ignore[assignment]
+        if len(row) != width:  # type: ignore[arg-type]
+            raise ValueError("two-dimensional initial state must match lattice width")
+        vector.extend(_ensure_finite(float(value)) for value in row)  # type: ignore[arg-type]
     return vector
 
 
@@ -109,6 +135,22 @@ def _life_linear_response(
     return response
 
 
+def _life_linear_response_transpose(
+    vector: Sequence[float],
+    neighbours: Sequence[Sequence[int]],
+    *,
+    survival_weight: float,
+    birth_weight: float,
+) -> Vector:
+    neighbour_factor = birth_weight / 3.0
+    transpose: Vector = [survival_weight * value for value in vector]
+    for cell_index, adjacent in enumerate(neighbours):
+        contribution = neighbour_factor * vector[cell_index]
+        for neighbour_index in adjacent:
+            transpose[neighbour_index] += contribution
+    return transpose
+
+
 def _life_objective(
     vector: Sequence[float],
     target: Sequence[float],
@@ -123,13 +165,46 @@ def _life_objective(
     residual = [current - target_value for current, target_value in zip(response, target)]
 
     value = 0.5 * sum(res * res for res in residual)
+    gradient = _life_linear_response_transpose(
+        residual,
+        neighbours,
+        survival_weight=survival_weight,
+        birth_weight=birth_weight,
+    )
+    return value, gradient
 
-    gradient = [survival_weight * res for res in residual]
-    neighbour_factor = birth_weight / 3.0
-    for cell_index, adjacent in enumerate(neighbours):
-        contribution = neighbour_factor * residual[cell_index]
-        for neighbour_index in adjacent:
-            gradient[neighbour_index] += contribution
+
+def _life_objective_multistep(
+    vector: Sequence[float],
+    target: Sequence[float],
+    neighbours: Sequence[Sequence[int]],
+    steps: int,
+    *,
+    survival_weight: float,
+    birth_weight: float,
+) -> tuple[float, Vector]:
+    activations: List[Vector] = [list(vector)]
+    current = vector
+    for _ in range(steps):
+        current = _life_linear_response(
+            current,
+            neighbours,
+            survival_weight=survival_weight,
+            birth_weight=birth_weight,
+        )
+        activations.append(list(current))
+
+    residual = [current_value - target_value for current_value, target_value in zip(activations[-1], target)]
+    value = 0.5 * sum(res * res for res in residual)
+
+    gradient: Vector = residual
+    for _ in range(steps, 0, -1):
+        gradient = _life_linear_response_transpose(
+            gradient,
+            neighbours,
+            survival_weight=survival_weight,
+            birth_weight=birth_weight,
+        )
     return value, gradient
 
 
@@ -261,9 +336,92 @@ def optimise_game_of_life(
     )
 
 
+def optimise_game_of_life_multistep(
+    lattice: LifeLattice,
+    target_state: Sequence[Sequence[float]] | Sequence[float],
+    steps: int,
+    *,
+    survival_weight: float = 0.6,
+    birth_weight: float = 0.4,
+    learning_rate: float = 0.2,
+    max_iter: int = 512,
+    tolerance: float = 1e-6,
+    callback: Optional[Callback] = None,
+) -> LifeOptimisationResult:
+    """Gradient descent for matching a multi-step relaxed Life evolution."""
+
+    if steps <= 0:
+        raise ValueError("steps must be a positive integer")
+    if learning_rate <= 0:
+        raise ValueError("learning_rate must be positive")
+    if max_iter <= 0:
+        raise ValueError("max_iter must be positive")
+    if tolerance <= 0:
+        raise ValueError("tolerance must be positive")
+
+    target = _to_vector_unbounded(lattice.height, lattice.width, target_state)
+
+    current = lattice.as_vector()
+    neighbours = lattice.neighbours()
+
+    converged = False
+    objective_value = math.inf
+
+    for iteration in range(1, max_iter + 1):
+        objective_value, gradient = _life_objective_multistep(
+            current,
+            target,
+            neighbours,
+            steps,
+            survival_weight=survival_weight,
+            birth_weight=birth_weight,
+        )
+
+        grad_norm = math.sqrt(sum(component * component for component in gradient))
+        if grad_norm <= tolerance:
+            converged = True
+            if callback:
+                callback(iteration, _reshape(current, lattice.width), objective_value)
+            break
+
+        updated = [value - learning_rate * grad for value, grad in zip(current, gradient)]
+        projected = [min(max(value, 0.0), 1.0) for value in updated]
+
+        delta = math.sqrt(sum((a - b) ** 2 for a, b in zip(projected, current)))
+        current = projected
+        lattice.update(current)
+
+        if callback:
+            callback(iteration, lattice.as_matrix(), objective_value)
+
+        if delta <= tolerance:
+            converged = True
+            break
+
+    final_vector = lattice.as_vector()
+    objective_value, _ = _life_objective_multistep(
+        final_vector,
+        target,
+        neighbours,
+        steps,
+        survival_weight=survival_weight,
+        birth_weight=birth_weight,
+    )
+
+    iterations = iteration if converged else max_iter
+
+    return LifeOptimisationResult(
+        lattice=lattice,
+        objective_value=objective_value,
+        iterations=iterations,
+        converged=converged,
+    )
+
+
 __all__ = [
     "LifeLattice",
     "LifeOptimisationResult",
     "optimise_game_of_life",
+    "optimise_game_of_life_multistep",
 ]
 
