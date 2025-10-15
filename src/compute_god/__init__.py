@@ -47,6 +47,7 @@ from .everything_demonstration import (
     physical_everything_metric,
     run_physical_everything_demonstration,
 )
+from .tianhe import TianheLine, 天和线
 from .catalysis import (
     CatalysisOutcome,
     Chanzi,
@@ -111,6 +112,8 @@ __all__ = [
     "physical_everything_demonstration_universe",
     "physical_everything_metric",
     "run_physical_everything_demonstration",
+    "TianheLine",
+    "天和线",
     "Jiuzi",
     "Chanzi",
     "CatalysisOutcome",
