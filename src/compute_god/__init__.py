@@ -19,6 +19,7 @@ from .entangle import (
     缠子,
     纠缠子,
 )
+from .existence import ExistenceWitness, StabilityWitness, 存在子, 稳定子
 from .ctc import ClosedTimelikeCurve, CTCOptimisationResult, optimise_closed_timelike_curve
 from .threshold import (
     ThresholdSpace,
@@ -63,6 +64,10 @@ __all__ = [
     "纠子",
     "缠子",
     "纠缠子",
+    "ExistenceWitness",
+    "StabilityWitness",
+    "存在子",
+    "稳定子",
     "ClosedTimelikeCurve",
     "CTCOptimisationResult",
     "optimise_closed_timelike_curve",
