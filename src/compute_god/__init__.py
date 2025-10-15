@@ -82,6 +82,12 @@ from .everything_demonstration import (
     physical_everything_metric,
     run_physical_everything_demonstration,
 )
+from .drug_lab import (
+    DrugLabOptimisationResult,
+    drug_lab_metric,
+    ideal_drug_lab_universe,
+    run_drug_lab,
+)
 from .tianhe import TianheLine, 天和线
 from .catalysis import (
     CatalysisOutcome,
@@ -235,6 +241,10 @@ __all__ = [
     "physical_everything_demonstration_universe",
     "physical_everything_metric",
     "run_physical_everything_demonstration",
+    "DrugLabOptimisationResult",
+    "drug_lab_metric",
+    "ideal_drug_lab_universe",
+    "run_drug_lab",
     "TianheLine",
     "天和线",
     "Jiuzi",
