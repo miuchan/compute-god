@@ -40,6 +40,7 @@ from .threshold import (
     ThresholdOptimisationResult,
     optimise_threshold_space,
 )
+from .life import LifeLattice, LifeOptimisationResult, optimise_game_of_life
 from .degree_space import DegreeDual, DegreeSpace, DegreeTensor, tensor_product
 from .metaverse import (
     MetaverseBlueprint,
@@ -156,6 +157,9 @@ __all__ = [
     "ThresholdSpace",
     "ThresholdOptimisationResult",
     "optimise_threshold_space",
+    "LifeLattice",
+    "LifeOptimisationResult",
+    "optimise_game_of_life",
     "DegreeSpace",
     "DegreeDual",
     "DegreeTensor",
