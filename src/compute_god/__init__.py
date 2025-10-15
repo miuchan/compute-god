@@ -27,6 +27,7 @@ from .siqianzi import (
     死前子热对偶网络,
 )
 from .jiaose import ChromaticDual, Jiaozi, Sezi, chromatic_dual, 角子, 色子, 色角对偶
+from .august import EndlessAugust
 from .abura_soba import (
     AburaSobaProfile,
     NoodleCanvas,
@@ -128,6 +129,7 @@ __all__ = [
     "ObserverEvent",
     "MiyuBond",
     "bond_miyu",
+    "EndlessAugust",
     "Bingzi",
     "Pingzi",
     "PingziRelation",
