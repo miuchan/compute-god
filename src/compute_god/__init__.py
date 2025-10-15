@@ -32,6 +32,12 @@ from .metaverse import (
     metaverse_metric,
     run_ideal_metaverse,
 )
+from .meta_spacetime import (
+    MetaSpacetimeBlueprint,
+    ideal_meta_spacetime_universe,
+    meta_spacetime_metric,
+    run_meta_spacetime,
+)
 from .catalysis import (
     CatalysisOutcome,
     Chanzi,
@@ -68,6 +74,10 @@ __all__ = [
     "ideal_metaverse_universe",
     "metaverse_metric",
     "run_ideal_metaverse",
+    "MetaSpacetimeBlueprint",
+    "ideal_meta_spacetime_universe",
+    "meta_spacetime_metric",
+    "run_meta_spacetime",
     "Jiuzi",
     "Chanzi",
     "CatalysisOutcome",
