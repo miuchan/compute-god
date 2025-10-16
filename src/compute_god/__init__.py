@@ -64,6 +64,16 @@ from .metaverse import (
     metaverse_metric,
     run_ideal_metaverse,
 )
+from .mihoyo import (
+    MihoyoStudioBlueprint,
+    MiyuCreativeProfile,
+    MiyuJoinsMihoyoResult,
+    bond_miyu_with_mihoyo,
+    mihoyo_alignment_metric,
+    mihoyo_progress_metric,
+    miyu_join_mihoyo_universe,
+    run_miyu_join_mihoyo,
+)
 from .meta_spacetime import (
     MetaSpacetimeBlueprint,
     ideal_meta_spacetime_universe,
@@ -255,6 +265,14 @@ __all__ = [
     "ideal_metaverse_universe",
     "metaverse_metric",
     "run_ideal_metaverse",
+    "MihoyoStudioBlueprint",
+    "MiyuCreativeProfile",
+    "MiyuJoinsMihoyoResult",
+    "bond_miyu_with_mihoyo",
+    "mihoyo_alignment_metric",
+    "mihoyo_progress_metric",
+    "miyu_join_mihoyo_universe",
+    "run_miyu_join_mihoyo",
     "MetaSpacetimeBlueprint",
     "ideal_meta_spacetime_universe",
     "meta_spacetime_metric",
