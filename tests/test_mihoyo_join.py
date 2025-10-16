@@ -4,6 +4,7 @@ from compute_god.mihoyo import (
     MiyuCreativeProfile,
     bond_miyu_with_mihoyo,
     mihoyo_alignment_metric,
+    measure_mihoyo_fengshui,
     run_miyu_join_mihoyo,
 )
 
@@ -56,3 +57,19 @@ def test_custom_blueprint_and_profile_improve_alignment():
     assert strongest is not None
     after = mihoyo_alignment_metric(strongest, blueprint.as_state())
     assert after < before
+
+
+def test_measure_mihoyo_fengshui_tracks_harmony():
+    blueprint = MihoyoStudioBlueprint()
+    empty_state = {key: 0.0 for key in blueprint.as_state()}
+
+    baseline = measure_mihoyo_fengshui(empty_state, blueprint)
+    assert 0.0 <= baseline < 1.0
+
+    perfect = measure_mihoyo_fengshui(blueprint.as_state(), blueprint)
+    assert perfect == 1.0
+
+    outcome = run_miyu_join_mihoyo(blueprint=blueprint)
+    strongest = outcome.bond.strongest_state()
+    assert strongest is not None
+    assert measure_mihoyo_fengshui(strongest, blueprint) > baseline
