@@ -125,6 +125,7 @@ print(result.state["term"])
 * [药物实验室的设计与实现](docs/drug-lab-design-and-implementation.md)
 * [BUIDL in Public 宣言与执行节奏](docs/buidl-in-public.md)
 * [Heroism Universe：认清真相后依然热爱生活](docs/heroism-universe.md)
+* [在《我的世界》里实现「甜甜宇宙」](docs/tian-tian-universe-in-minecraft.md)
 
 ---
 
