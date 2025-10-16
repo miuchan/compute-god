@@ -164,7 +164,9 @@ def thermal_dual(machine: Jizi, submachine: Zijiji) -> Optional[ThermalDual]:
 
 # Chinese aliases so callers can embrace the playful API if desired.
 机子 = Jizi
+日子 = Jizi
 子机机 = Zijiji
+月子 = Zijiji
 热对偶 = thermal_dual
 自机子对偶 = thermal_dual
 
@@ -175,7 +177,9 @@ __all__ = [
     "ThermalDual",
     "thermal_dual",
     "机子",
+    "日子",
     "子机机",
+    "月子",
     "热对偶",
     "自机子对偶",
 ]
