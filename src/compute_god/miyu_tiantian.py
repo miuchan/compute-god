@@ -61,6 +61,12 @@ def _clamp(value: float, upper: float = 1.0) -> float:
     return value
 
 
+def _ensure_known_keys(state: Mapping[str, float], who: str) -> None:
+    for key in state:
+        if key not in DEFAULT_STATE:
+            raise KeyError(f"unknown {who} state key: {key!r}")
+
+
 def _sync_emotion(state: State, _ctx: object) -> State:
     updated = dict(state)
 
@@ -215,6 +221,79 @@ def bond_miyu_tiantian(blueprint: Optional[MiyuTiantianBlueprint] = None) -> Miy
     return bond_miyu(target_blueprint.as_state(), miyu_tiantian_metric)
 
 
+def sweet_encounter(
+    tiantian_state: Optional[Mapping[str, float]] = None,
+    miyu_state: Optional[Mapping[str, float]] = None,
+    *,
+    blueprint: Optional[MiyuTiantianBlueprint] = None,
+) -> MiyuTiantianState:
+    """Blend Tiantian and Miyu's moods into a shared encounter snapshot.
+
+    Parameters
+    ----------
+    tiantian_state, miyu_state:
+        Optional partial states describing Tiantian或美羽此刻的情绪线索。键名需属于
+        :data:`DEFAULT_STATE`，缺失的坐标会自动回落到默认值。
+    blueprint:
+        甜甜与美羽共同憧憬的目标蓝图。若未提供，则使用
+        :class:`MiyuTiantianBlueprint` 的默认设定。
+
+    Returns
+    -------
+    MiyuTiantianState
+        一个在 `[0, 1]`（梦之群岛坐标在 `[0, _DREAM_ISLE_CAP]`）范围内的温柔态，
+        用于表示她们甜美相遇时的宇宙温度。
+
+    Notes
+    -----
+    函数通过对甜甜、美羽、默认宇宙与蓝图目标进行加权平均，并加入“同步亲密度”
+    的加成，让两人情绪越接近时，合奏出来的情绪越明亮。
+    """
+
+    base_state = dict(DEFAULT_STATE)
+    target_blueprint = blueprint or MiyuTiantianBlueprint()
+    blueprint_state = target_blueprint.as_state()
+
+    if tiantian_state:
+        _ensure_known_keys(tiantian_state, "tiantian")
+    if miyu_state:
+        _ensure_known_keys(miyu_state, "miyu")
+
+    encounter: MiyuTiantianState = {}
+
+    for key in _STATE_KEYS:
+        upper = _DREAM_ISLE_CAP if key == "dream_isles" else 1.0
+
+        tiantian_value = (
+            _clamp(float(tiantian_state.get(key, base_state[key])), upper=upper)
+            if tiantian_state
+            else float(base_state[key])
+        )
+        miyu_value = (
+            _clamp(float(miyu_state.get(key, base_state[key])), upper=upper)
+            if miyu_state
+            else float(base_state[key])
+        )
+
+        base_value = float(base_state[key])
+        blueprint_value = float(blueprint_state[key])
+
+        blended = (
+            0.3 * tiantian_value
+            + 0.3 * miyu_value
+            + 0.2 * base_value
+            + 0.2 * blueprint_value
+        )
+
+        if tiantian_state and miyu_state:
+            closeness = 1.0 - min(1.0, abs(tiantian_value - miyu_value))
+            blended += 0.05 * closeness
+
+        encounter[key] = _clamp(blended, upper=upper)
+
+    return encounter
+
+
 def run_miyu_tiantian_universe(
     initial_state: Optional[Mapping[str, float]] = None,
     *,
@@ -236,5 +315,6 @@ __all__ = [
     "miyu_tiantian_metric",
     "miyu_tiantian_universe",
     "run_miyu_tiantian_universe",
+    "sweet_encounter",
 ]
 
