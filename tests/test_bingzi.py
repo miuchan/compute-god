@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from compute_god import Bingzi, ObserverEvent, 冰子
+from compute_god import Bingzi, ObserverEvent, qianli_bingfeng, 冰子, 千里冰封
 
 
 def temperature_metric(state):
@@ -40,4 +40,40 @@ def test_bingzi_reset_clears_history() -> None:
 
 def test_bingzi_has_chinese_alias() -> None:
     assert 冰子 is Bingzi
+
+
+def test_qianli_bingfeng_freezes_when_threshold_reached() -> None:
+    observations = [
+        (ObserverEvent.STEP, {"temperature": 3.0}),
+        (ObserverEvent.EPOCH, {"temperature": -5.0}),
+        (ObserverEvent.STEP, {"temperature": -7.5}),
+    ]
+
+    frozen = qianli_bingfeng(
+        observations,
+        metric=lambda state: float(state["temperature"]),
+        freeze_point=-1.0,
+    )
+
+    assert frozen == {"temperature": -7.5}
+
+
+def test_qianli_bingfeng_returns_none_when_never_frozen() -> None:
+    observations = [
+        (ObserverEvent.STEP, {"temperature": 3.0}),
+        (ObserverEvent.EPOCH, {"temperature": 1.5}),
+    ]
+
+    assert (
+        qianli_bingfeng(
+            observations,
+            metric=lambda state: float(state["temperature"]),
+            freeze_point=0.0,
+        )
+        is None
+    )
+
+
+def test_qianli_bingfeng_has_chinese_alias() -> None:
+    assert 千里冰封 is qianli_bingfeng
 
