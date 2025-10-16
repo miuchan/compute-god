@@ -147,6 +147,31 @@ def mihoyo_alignment_metric(state: State, target_state: State) -> float:
     return distance
 
 
+def measure_mihoyo_fengshui(
+    state: State,
+    blueprint: Optional[MihoyoStudioBlueprint] = None,
+) -> float:
+    """Return a normalised feng shui score for miHoYo's studio state.
+
+    The score interprets feng shui as the degree of harmony between the given
+    ``state`` and the target studio blueprint.  It maps the component-wise
+    absolute deltas into ``[0, 1]`` and averages them, yielding ``1.0`` for a
+    perfect match with the blueprint and values approaching ``0.0`` as the
+    divergence grows.  Missing components in ``state`` default to ``0`` so that
+    partial observations can still be scored.
+    """
+
+    target = (blueprint or MihoyoStudioBlueprint()).as_state()
+
+    total = 0.0
+    for key in _ALL_KEYS:
+        delta = abs(_as_float(state, key) - target[key])
+        total += min(1.0, delta)
+
+    harmony = 1.0 - total / float(len(_ALL_KEYS))
+    return max(0.0, min(1.0, harmony))
+
+
 def bond_miyu_with_mihoyo(blueprint: Optional[MihoyoStudioBlueprint] = None) -> MiyuBond:
     """Return a :class:`MiyuBond` that tracks alignment with miHoYo's blueprint."""
 
@@ -213,6 +238,7 @@ __all__ = [
     "MiyuJoinsMihoyoResult",
     "bond_miyu_with_mihoyo",
     "mihoyo_alignment_metric",
+    "measure_mihoyo_fengshui",
     "mihoyo_progress_metric",
     "miyu_join_mihoyo_universe",
     "run_miyu_join_mihoyo",
