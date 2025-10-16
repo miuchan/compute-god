@@ -254,6 +254,7 @@ from .courtship_cohomology import (
     courtship_cohomology_story,
 )
 from .world import WorldExecutionRequest, world_execute
+from .earth_rescue import EarthState, RescueParameters, rescue_map, save_earth
 from .shuangxiang import (
     BiphasicOptimisationResult,
     BiphasicState,
@@ -468,6 +469,10 @@ __all__ = [
     "传颂之物",
     "WorldExecutionRequest",
     "world_execute",
+    "EarthState",
+    "RescueParameters",
+    "rescue_map",
+    "save_earth",
     "BiphasicState",
     "BiphasicOptimisationResult",
     "continue_biphasic_descent",
