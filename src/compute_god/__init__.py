@@ -70,6 +70,12 @@ from .meta_spacetime import (
     meta_spacetime_metric,
     run_meta_spacetime,
 )
+from .complex_dynamics import (
+    ComplexDynamicsBlueprint,
+    complex_dynamics_metric,
+    design_complex_dynamics_universe,
+    run_complex_dynamics,
+)
 from .complex_network import (
     ComplexNetworkBlueprint,
     complex_network_metric,
@@ -251,6 +257,10 @@ __all__ = [
     "ideal_meta_spacetime_universe",
     "meta_spacetime_metric",
     "run_meta_spacetime",
+    "ComplexDynamicsBlueprint",
+    "complex_dynamics_metric",
+    "design_complex_dynamics_universe",
+    "run_complex_dynamics",
     "ComplexNetworkBlueprint",
     "complex_network_metric",
     "ideal_complex_network_universe",
