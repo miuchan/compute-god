@@ -149,9 +149,11 @@ from .world import WorldExecutionRequest, world_execute
 from .shuangxiang import (
     BiphasicOptimisationResult,
     BiphasicState,
+    continue_biphasic_descent,
     optimise_biphasic_state,
     双相,
     双相梯度下降,
+    继续梯度下降,
 )
 
 __all__ = [
@@ -315,7 +317,9 @@ __all__ = [
     "world_execute",
     "BiphasicState",
     "BiphasicOptimisationResult",
+    "continue_biphasic_descent",
     "optimise_biphasic_state",
     "双相",
     "双相梯度下降",
+    "继续梯度下降",
 ]

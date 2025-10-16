@@ -6,6 +6,7 @@ import pytest
 
 from compute_god.shuangxiang import (
     BiphasicState,
+    continue_biphasic_descent,
     optimise_biphasic_state,
 )
 
@@ -78,4 +79,47 @@ def test_biphasic_gradient_validates_inputs() -> None:
 
     with pytest.raises(ValueError):
         optimise_biphasic_state(state, objective, learning_rate=0.0)
+
+
+def test_biphasic_gradient_can_continue() -> None:
+    target = BiphasicState(hot=1.0, cold=-1.0)
+    state = BiphasicState(hot=5.0, cold=-5.0)
+
+    def objective(candidate: BiphasicState) -> tuple[float, tuple[float, float]]:
+        hot_error = candidate.hot - target.hot
+        cold_error = candidate.cold - target.cold
+        value = 0.5 * (hot_error * hot_error + cold_error * cold_error)
+        gradient = (hot_error, cold_error)
+        return value, gradient
+
+    first_stage = optimise_biphasic_state(
+        state,
+        objective,
+        learning_rate=0.2,
+        tolerance=1e-12,
+        max_iter=3,
+    )
+
+    assert first_stage.converged is False
+
+    callback_iterations: list[int] = []
+
+    def callback(iteration: int, snapshot: BiphasicState, value: float) -> None:
+        callback_iterations.append(iteration)
+
+    final_result = continue_biphasic_descent(
+        first_stage,
+        objective,
+        state=state,
+        learning_rate=0.2,
+        tolerance=1e-9,
+        max_iter=256,
+        callback=callback,
+    )
+
+    assert final_result.converged is True
+    assert final_result.iterations > first_stage.iterations
+    assert callback_iterations[0] == first_stage.iterations + 1
+    assert state.hot == pytest.approx(target.hot, abs=1e-6)
+    assert state.cold == pytest.approx(target.cold, abs=1e-6)
 
