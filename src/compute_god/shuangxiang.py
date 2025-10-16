@@ -148,15 +148,76 @@ def optimise_biphasic_state(
     )
 
 
+def continue_biphasic_descent(
+    result: BiphasicOptimisationResult,
+    objective: Objective,
+    *,
+    state: Optional[BiphasicState] = None,
+    learning_rate: Optional[float] = None,
+    tolerance: Optional[float] = None,
+    max_iter: int = 256,
+    projection: Optional[Projection] = None,
+    callback: Optional[Callback] = None,
+) -> BiphasicOptimisationResult:
+    """Resume gradient descent from a previous optimisation result.
+
+    Parameters mirror :func:`optimise_biphasic_state` with the addition of an
+    optional ``state`` argument.  When provided, the state is mutated in place
+    before being returned in the new result.  Otherwise a defensive copy of the
+    state held in ``result`` is used, leaving the original untouched.
+
+    Callback invocations continue the iteration count from ``result`` so that
+    logs remain monotonic when optimisation proceeds in multiple stages.
+    """
+
+    working_state = state if state is not None else result.state.copy()
+
+    offset = result.iterations
+    effective_callback: Optional[Callback]
+    if callback is None:
+        effective_callback = None
+    else:
+        def wrapped_callback(iteration: int, state: BiphasicState, value: float) -> None:
+            callback(offset + iteration, state, value)
+
+        effective_callback = wrapped_callback
+
+    optimisation_kwargs = {
+        "max_iter": max_iter,
+        "projection": projection,
+        "callback": effective_callback,
+    }
+
+    if learning_rate is not None:
+        optimisation_kwargs["learning_rate"] = learning_rate
+    if tolerance is not None:
+        optimisation_kwargs["tolerance"] = tolerance
+
+    continued = optimise_biphasic_state(
+        working_state,
+        objective,
+        **optimisation_kwargs,
+    )
+
+    return BiphasicOptimisationResult(
+        state=continued.state,
+        objective_value=continued.objective_value,
+        iterations=offset + continued.iterations,
+        converged=continued.converged,
+    )
+
+
 # Playful aliases embracing the poetic API surface.
 双相 = BiphasicState
 双相梯度下降 = optimise_biphasic_state
+继续梯度下降 = continue_biphasic_descent
 
 
 __all__ = [
     "BiphasicState",
     "BiphasicOptimisationResult",
     "optimise_biphasic_state",
+    "continue_biphasic_descent",
     "双相",
     "双相梯度下降",
 ]
