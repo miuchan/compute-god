@@ -10,9 +10,19 @@ from .universe import God, Universe
 from .engine import fixpoint, FixpointResult
 from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
-from .bingzi import Bingzi, Pingzi, peculiar_asymmetry, 冰子, 瓶子
+from .bingzi import Bingzi, Pingzi, peculiar_asymmetry, qianli_bingfeng, 冰子, 千里冰封, 瓶子
 from .jizi import Jizi, ThermalDual, Zijiji, thermal_dual, 机子, 子机机, 热对偶, 自机子对偶
-from .bingzi import Bingzi, Pingzi, PingziRelation, peculiar_asymmetry, 冰子, 瓶子, 平子
+from .bingzi import (
+    Bingzi,
+    Pingzi,
+    PingziRelation,
+    peculiar_asymmetry,
+    qianli_bingfeng,
+    冰子,
+    千里冰封,
+    瓶子,
+    平子,
+)
 from .sanzi import Sanzi, SanziOverview, Weizi, 三子, 维子
 from .siqianzi import (
     Siqianzi,
@@ -199,7 +209,9 @@ __all__ = [
     "Pingzi",
     "PingziRelation",
     "peculiar_asymmetry",
+    "qianli_bingfeng",
     "冰子",
+    "千里冰封",
     "瓶子",
     "Sanzi",
     "SanziOverview",

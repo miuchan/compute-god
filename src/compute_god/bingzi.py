@@ -17,12 +17,13 @@ their ``freeze_point`` or retrieve the coldest snapshot for further analysis.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Callable, List, MutableMapping, Optional, Tuple
+from typing import Callable, Iterable, List, MutableMapping, Optional, Tuple
 
 from .observer import ObserverEvent
 
 State = MutableMapping[str, object]
 TemperatureMetric = Callable[[State], float]
+Observation = Tuple[ObserverEvent, State]
 
 
 @dataclass
@@ -191,10 +192,46 @@ class PingziRelation:
         return abs(midpoint) <= tolerance
 
 
+def qianli_bingfeng(
+    observations: Iterable[Observation],
+    *,
+    metric: TemperatureMetric,
+    freeze_point: float = 0.0,
+) -> Optional[State]:
+    """Return the coldest state once the observer freezes across the expanse.
+
+    The helper acts as a tiny convenience façade around :class:`Bingzi` for the
+    poetic ``千里冰封`` imagery.  Callers provide an iterable of observations –
+    event/state pairs – together with a temperature metric.  The sequence is fed
+    through a fresh ``Bingzi`` instance and the coldest recorded state is
+    returned once the observer reaches or crosses ``freeze_point``.  If the
+    threshold is never met ``None`` is produced instead.
+
+    Parameters
+    ----------
+    observations:
+        Iterable of :class:`ObserverEvent` / state pairs to evaluate.
+    metric:
+        Callable measuring the "temperature" of each state.
+    freeze_point:
+        Threshold deciding when the observer is considered frozen.  Defaults to
+        ``0.0`` mirroring :class:`Bingzi`'s constructor.
+    """
+
+    observer = Bingzi(metric=metric, freeze_point=freeze_point)
+    for event, state in observations:
+        observer(event, state)
+
+    if not observer.is_frozen:
+        return None
+    return observer.coldest_state()
+
+
 # Chinese aliases so users can embrace the playful API surface.
 冰子 = Bingzi
 瓶子 = Pingzi
 平子 = PingziRelation
+千里冰封 = qianli_bingfeng
 
 
 __all__ = [
@@ -205,5 +242,7 @@ __all__ = [
     "冰子",
     "瓶子",
     "平子",
+    "qianli_bingfeng",
+    "千里冰封",
 ]
 
