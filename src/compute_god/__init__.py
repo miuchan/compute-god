@@ -32,6 +32,7 @@ from .jiahao import (
     jiahao_max_thermal_dual_from_network,
     嘉豪最大热对偶,
 )
+from .yihong import YihongMiyuThermalDual, yihong_miyu_thermal_dual, 一弘美羽热对偶
 from .jiaose import ChromaticDual, Jiaozi, Sezi, chromatic_dual, 角子, 色子, 色角对偶
 from .august import EndlessAugust
 from .abura_soba import (
@@ -211,6 +212,8 @@ __all__ = [
     "JiahaoMaximumThermalDual",
     "jiahao_max_thermal_dual",
     "jiahao_max_thermal_dual_from_network",
+    "YihongMiyuThermalDual",
+    "yihong_miyu_thermal_dual",
     "Jiaozi",
     "Sezi",
     "ChromaticDual",
@@ -235,6 +238,7 @@ __all__ = [
     "死前子网络",
     "死前子热对偶网络",
     "嘉豪最大热对偶",
+    "一弘美羽热对偶",
     "AburaSobaProfile",
     "NoodleCanvas",
     "OilLayer",
