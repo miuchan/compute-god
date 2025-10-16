@@ -1,15 +1,65 @@
-"""Compute-God Python runtime.
+"""Compute-God Python runtime."""
 
-This module exposes a minimal framework inspired by the README. It provides the
-basic pieces required to declare a universe of rules and iteratively search for
-fixpoints under a user supplied metric.
-"""
+from types import ModuleType
+import sys
 
-from .rule import Rule, rule
-from .universe import God, Universe
-from .engine import fixpoint, FixpointResult
-from .observer import Observer, ObserverEvent
+from .core import (
+    ApplyFn,
+    FixpointEngine,
+    FixpointResult,
+    God,
+    Observer,
+    ObserverEvent,
+    NoopObserver,
+    Rule,
+    PredicateFn,
+    RuleContext,
+    State,
+    Universe,
+    Metric,
+    combine_observers,
+    fixpoint,
+    rule,
+)
 from .miyu import MiyuBond, bond_miyu
+
+
+def _register_compat_module(name: str, **attrs: object) -> ModuleType:
+    module = ModuleType(f"{__name__}.{name}")
+    module.__dict__.update(attrs)
+    module.__all__ = tuple(attrs.keys())  # type: ignore[attr-defined]
+    sys.modules[f"{__name__}.{name}"] = module
+    return module
+
+
+_register_compat_module(
+    "rule",
+    Rule=Rule,
+    rule=rule,
+    ApplyFn=ApplyFn,
+    PredicateFn=PredicateFn,
+    RuleContext=RuleContext,
+    State=State,
+)
+_register_compat_module(
+    "engine",
+    FixpointEngine=FixpointEngine,
+    FixpointResult=FixpointResult,
+    Metric=Metric,
+    fixpoint=fixpoint,
+)
+_register_compat_module(
+    "observer",
+    Observer=Observer,
+    ObserverEvent=ObserverEvent,
+    NoopObserver=NoopObserver,
+    combine_observers=combine_observers,
+)
+_register_compat_module(
+    "universe",
+    God=God,
+    Universe=Universe,
+)
 from .bingzi import Bingzi, Pingzi, peculiar_asymmetry, qianli_bingfeng, 冰子, 千里冰封, 瓶子
 from .jizi import (
     Jizi,
@@ -215,14 +265,22 @@ from .shuangxiang import (
 )
 
 __all__ = [
+    "ApplyFn",
+    "PredicateFn",
+    "Metric",
+    "State",
+    "RuleContext",
     "Rule",
     "rule",
     "God",
     "Universe",
+    "combine_observers",
     "fixpoint",
+    "FixpointEngine",
     "FixpointResult",
     "Observer",
     "ObserverEvent",
+    "NoopObserver",
     "MiyuBond",
     "bond_miyu",
     "EndlessAugust",

@@ -13,9 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from .engine import FixpointResult, Metric, fixpoint
-from .rule import State, rule
-from .universe import God
+from .core import FixpointResult, God, Metric, State, fixpoint, rule
 
 
 @dataclass(frozen=True)

@@ -25,11 +25,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import MutableMapping, Optional, Sequence
 
-from .engine import FixpointResult, fixpoint
+from .core import FixpointResult, God, Observer, Rule, State, Universe, fixpoint, rule
 from .miyu import MiyuBond, bond_miyu
-from .observer import Observer
-from .rule import Rule, State, rule
-from .universe import God, Universe
 
 StudioState = MutableMapping[str, float]
 
