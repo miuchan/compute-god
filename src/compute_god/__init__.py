@@ -46,6 +46,15 @@ from .entangle import (
     缠子,
     纠缠子,
 )
+from .anti_quantum import (
+    AntiQuantumAlgorithm,
+    AntiQuantumDual,
+    QuantumAttackSurface,
+    anti_quantum_dual,
+    抗量子算法,
+    抗量子对偶,
+    量子攻击面,
+)
 from .existence import ExistenceWitness, StabilityWitness, 存在子, 稳定子
 from .ctc import ClosedTimelikeCurve, CTCOptimisationResult, optimise_closed_timelike_curve
 from .threshold import ThresholdSpace, ThresholdOptimisationResult, optimise_threshold_space
@@ -223,6 +232,13 @@ __all__ = [
     "Topping",
     "assemble_abura_soba",
     "油そば",
+    "AntiQuantumAlgorithm",
+    "AntiQuantumDual",
+    "QuantumAttackSurface",
+    "anti_quantum_dual",
+    "抗量子算法",
+    "量子攻击面",
+    "抗量子对偶",
     "Jiuzi",
     "Chanzi",
     "Entangler",
