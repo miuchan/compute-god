@@ -119,6 +119,15 @@ from .complex_network import (
     ideal_complex_network_universe,
     run_complex_network,
 )
+from .llm_cooperation import (
+    DEFAULT_LLM_COOPERATION,
+    LLMAgentContribution,
+    LLMCooperationBlueprint,
+    ideal_llm_cooperation_universe,
+    llm_cooperation_blueprint_from_agents,
+    llm_cooperation_metric,
+    run_llm_cooperation,
+)
 from .everything_demonstration import (
     EverythingDemonstrationBlueprint,
     physical_everything_demonstration_universe,
@@ -329,6 +338,13 @@ __all__ = [
     "complex_network_metric",
     "ideal_complex_network_universe",
     "run_complex_network",
+    "LLMAgentContribution",
+    "LLMCooperationBlueprint",
+    "DEFAULT_LLM_COOPERATION",
+    "ideal_llm_cooperation_universe",
+    "llm_cooperation_blueprint_from_agents",
+    "llm_cooperation_metric",
+    "run_llm_cooperation",
     "EverythingDemonstrationBlueprint",
     "physical_everything_demonstration_universe",
     "physical_everything_metric",
