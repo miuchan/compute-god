@@ -12,6 +12,7 @@ from .observer import Observer, ObserverEvent
 from .miyu import MiyuBond, bond_miyu
 from .bingzi import Bingzi, Pingzi, peculiar_asymmetry, qianli_bingfeng, 冰子, 千里冰封, 瓶子
 from .jizi import Jizi, ThermalDual, Zijiji, thermal_dual, 机子, 子机机, 热对偶, 自机子对偶
+from .eternity_end import EternityEndThermalDual, eternity_end_thermal_dual, 永恒终结热对偶
 from .bingzi import (
     Bingzi,
     Pingzi,
@@ -250,6 +251,9 @@ __all__ = [
     "子机机",
     "热对偶",
     "自机子对偶",
+    "EternityEndThermalDual",
+    "eternity_end_thermal_dual",
+    "永恒终结热对偶",
     "三子",
     "维子",
     "平子",
