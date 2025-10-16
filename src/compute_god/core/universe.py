@@ -1,13 +1,16 @@
+"""Universe definitions for Compute-God."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Iterable, List, MutableMapping, Optional, Sequence
 
 from .observer import NoopObserver, Observer
-from .rule import Rule, RuleContext, State
+from .rules import Rule
+from .types import RuleContext, State
 
 
-@dataclass
+@dataclass(frozen=True)
 class Universe:
     """Container for the state, rules and observers."""
 
@@ -19,8 +22,6 @@ class Universe:
         return sorted(self.rules, key=lambda r: r.priority, reverse=True)
 
     def rules_by_role(self, role: Optional[str]) -> List[Rule]:
-        """Return the rules matching ``role`` ordered by priority."""
-
         if role is None:
             return self.sorted_rules()
         return [rule for rule in self.sorted_rules() if rule.role == role]
@@ -56,3 +57,6 @@ class God:
     @staticmethod
     def rule_context() -> RuleContext:
         return _RuleContextImpl()
+
+
+__all__ = ["God", "Universe"]

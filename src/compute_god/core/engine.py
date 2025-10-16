@@ -1,16 +1,18 @@
+"""Fixpoint execution engine."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Callable, Optional
 
 from .observer import Observer, ObserverEvent, combine_observers
-from .rule import RuleContext, State
+from .types import RuleContext, State
 from .universe import God, Universe
 
 Metric = Callable[[State, State], float]
 
 
-@dataclass
+@dataclass(frozen=True)
 class FixpointResult:
     universe: Universe
     converged: bool
@@ -68,6 +70,42 @@ def _apply_rules(universe: Universe, ctx: RuleContext, observer: Observer) -> St
     return state
 
 
+class FixpointEngine:
+    """High level wrapper coordinating fixpoint execution."""
+
+    def __init__(
+        self,
+        *,
+        metric: Metric,
+        epsilon: float,
+        max_epoch: int,
+        observer: Optional[Observer] = None,
+    ) -> None:
+        self._metric = metric
+        self._epsilon = epsilon
+        self._max_epoch = max_epoch
+        self._observer = observer
+
+    def run(self, universe: Universe) -> FixpointResult:
+        ctx = God.rule_context()
+        observer = self._observer or combine_observers(*universe.observers)
+        epoch_ctx = _EpochContext(
+            observer=observer,
+            metric=self._metric,
+            epsilon=self._epsilon,
+            initial_state=universe.state,
+        )
+
+        for epoch in range(1, self._max_epoch + 1):
+            new_state = _apply_rules(universe, ctx, observer)
+            universe = Universe(new_state, universe.rules, universe.observers)
+            if epoch_ctx.record(new_state, epoch=epoch):
+                return FixpointResult(universe=universe, converged=True, epochs=epoch)
+
+        observer(ObserverEvent.FIXPOINT_MAXED, universe.state, epoch=self._max_epoch)
+        return FixpointResult(universe=universe, converged=False, epochs=self._max_epoch)
+
+
 def fixpoint(
     universe: Universe,
     *,
@@ -76,21 +114,8 @@ def fixpoint(
     max_epoch: int,
     observer: Optional[Observer] = None,
 ) -> FixpointResult:
-    ctx = God.rule_context()
-    if observer is None:
-        observer = combine_observers(*universe.observers)
-    epoch_ctx = _EpochContext(
-        observer=observer,
-        metric=metric,
-        epsilon=epsilon,
-        initial_state=universe.state,
-    )
+    engine = FixpointEngine(metric=metric, epsilon=epsilon, max_epoch=max_epoch, observer=observer)
+    return engine.run(universe)
 
-    for epoch in range(1, max_epoch + 1):
-        new_state = _apply_rules(universe, ctx, observer)
-        universe = Universe(new_state, universe.rules, universe.observers)
-        if epoch_ctx.record(new_state, epoch=epoch):
-            return FixpointResult(universe=universe, converged=True, epochs=epoch)
 
-    observer(ObserverEvent.FIXPOINT_MAXED, universe.state, epoch=max_epoch)
-    return FixpointResult(universe=universe, converged=False, epochs=max_epoch)
+__all__ = ["FixpointEngine", "FixpointResult", "Metric", "fixpoint"]

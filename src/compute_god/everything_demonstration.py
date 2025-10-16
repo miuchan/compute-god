@@ -15,10 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Mapping, MutableMapping, Optional, Sequence
 
-from .engine import FixpointResult, fixpoint
-from .observer import Observer
-from .rule import Rule, State, rule
-from .universe import God, Universe
+from .core import FixpointResult, God, Observer, Rule, State, Universe, fixpoint, rule
 
 PhysicalDemonstrationState = MutableMapping[str, float]
 

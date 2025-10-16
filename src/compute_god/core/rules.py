@@ -1,18 +1,12 @@
+"""Rule declarations for the Compute-God runtime."""
+
 from __future__ import annotations
 
 import inspect
 from dataclasses import dataclass, field
-from typing import Callable, Dict, MutableMapping, Optional, Protocol
+from typing import Callable, Dict, Optional
 
-State = MutableMapping[str, object]
-
-
-class RuleContext(Protocol):
-    """Protocol capturing the runtime context exposed to rules."""
-
-    def steps(self) -> int:
-        ...
-
+from .types import RuleContext, State
 
 ApplyFn = Callable[[State, RuleContext], State]
 PredicateFn = Callable[[State, RuleContext], bool]
@@ -51,12 +45,7 @@ def rule(
     role: Optional[str] = None,
     annotations: Optional[Dict[str, object]] = None,
 ) -> Rule:
-    """Helper to lift a simple state transformer into a :class:`Rule`.
-
-    The helper accepts an ``apply`` callable that may either take the raw state or
-    the pair ``(state, ctx)``. When only ``state`` is expected a thin adapter is
-    inserted.
-    """
+    """Lift a simple state transformer into a :class:`Rule` instance."""
 
     if annotations is None:
         annotations = {}
@@ -101,3 +90,6 @@ def rule(
         role=role,
         annotations=annotations,
     )
+
+
+__all__ = ["ApplyFn", "PredicateFn", "Rule", "rule"]

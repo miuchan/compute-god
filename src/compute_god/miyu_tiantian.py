@@ -24,11 +24,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Mapping, MutableMapping, Optional, Sequence
 
-from .engine import FixpointResult, fixpoint
+from .core import FixpointResult, God, Observer, Rule, State, Universe, fixpoint, rule
 from .miyu import MiyuBond, bond_miyu
-from .observer import Observer
-from .rule import Rule, State, rule
-from .universe import God, Universe
 
 
 MiyuTiantianState = MutableMapping[str, float]

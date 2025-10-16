@@ -22,7 +22,7 @@ from itertools import combinations
 from typing import Dict, List, MutableMapping, Optional, Tuple
 
 from .jizi import Jizi, ThermalDual, Zijiji, thermal_dual
-from .observer import ObserverEvent
+from .core import ObserverEvent
 
 State = MutableMapping[str, object]
 

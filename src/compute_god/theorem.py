@@ -3,10 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Dict, Iterable, Iterator, List, MutableMapping, Optional, Sequence, Set, Tuple
 
-from .engine import FixpointResult, fixpoint
-from .observer import Observer
-from .rule import RuleContext, State, rule
-from .universe import God, Universe
+from .core import FixpointResult, God, Observer, RuleContext, State, Universe, fixpoint, rule
 
 Statement = str
 Premises = Tuple[Statement, ...]
