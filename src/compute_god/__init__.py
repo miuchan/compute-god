@@ -87,7 +87,19 @@ _register_compat_module(
     God=God,
     Universe=Universe,
 )
-from .bingzi import Bingzi, Pingzi, peculiar_asymmetry, qianli_bingfeng, 冰子, 千里冰封, 瓶子
+from .bingzi import (
+    Bingzi,
+    Mingzi,
+    Pingzi,
+    Liangzi,
+    peculiar_asymmetry,
+    qianli_bingfeng,
+    冰子,
+    千里冰封,
+    瓶子,
+    明子,
+    亮子,
+)
 from .jizi import (
     Jizi,
     ThermalDual,
@@ -103,14 +115,18 @@ from .jizi import (
 from .eternity_end import EternityEndThermalDual, eternity_end_thermal_dual, 永恒终结热对偶
 from .bingzi import (
     Bingzi,
+    Mingzi,
     Pingzi,
     PingziRelation,
+    Liangzi,
     peculiar_asymmetry,
     qianli_bingfeng,
     冰子,
     千里冰封,
     瓶子,
     平子,
+    明子,
+    亮子,
 )
 from .sanzi import Sanzi, SanziOverview, Weizi, 三子, 维子
 from .siqianzi import (

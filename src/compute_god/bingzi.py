@@ -25,6 +25,11 @@ State = MutableMapping[str, object]
 TemperatureMetric = Callable[[State], float]
 Observation = Tuple[ObserverEvent, State]
 
+# ``Bingzi`` 和 ``Pingzi`` 主要围绕“温度”展开。随着生态演化，该系列
+# 经常被拿来观察其它“极值”维度，比如明暗变化。因此我们在此定义一组
+# 通用的别名，既可以在温度上下文中使用，也能服务新的亮度观察者。
+BrightnessMetric = Callable[[State], float]
+
 
 @dataclass
 class Bingzi:
@@ -135,6 +140,88 @@ class Pingzi:
         self._hottest_state = None
 
 
+@dataclass
+class Mingzi:
+    """Observer capturing the dimmest brightness encountered so far."""
+
+    metric: BrightnessMetric
+    dawn_point: float = 0.0
+    history: List[Tuple[ObserverEvent, float]] = field(default_factory=list, init=False)
+    dimmest_value: Optional[float] = field(default=None, init=False)
+    _dimmest_state: Optional[State] = field(default=None, init=False, repr=False)
+
+    def __call__(self, event: ObserverEvent, state: State, /, **metadata: object) -> None:
+        """Record ``state`` together with its evaluated brightness."""
+
+        brightness = float(self.metric(state))
+        self.history.append((event, brightness))
+
+        if self.dimmest_value is None or brightness < self.dimmest_value:
+            self.dimmest_value = brightness
+            self._dimmest_state = dict(state)
+
+    @property
+    def is_dim(self) -> bool:
+        """Return ``True`` once a brightness at or below ``dawn_point`` is seen."""
+
+        return self.dimmest_value is not None and self.dimmest_value <= self.dawn_point
+
+    def dimmest_state(self) -> Optional[State]:
+        """Return a defensive copy of the dimmest state encountered so far."""
+
+        if self._dimmest_state is None:
+            return None
+        return dict(self._dimmest_state)
+
+    def reset(self) -> None:
+        """Clear recorded information so the observer can be reused."""
+
+        self.history.clear()
+        self.dimmest_value = None
+        self._dimmest_state = None
+
+
+@dataclass
+class Liangzi:
+    """Observer capturing the brightest brightness encountered so far."""
+
+    metric: BrightnessMetric
+    shine_point: float = 100.0
+    history: List[Tuple[ObserverEvent, float]] = field(default_factory=list, init=False)
+    brightest_value: Optional[float] = field(default=None, init=False)
+    _brightest_state: Optional[State] = field(default=None, init=False, repr=False)
+
+    def __call__(self, event: ObserverEvent, state: State, /, **metadata: object) -> None:
+        """Record ``state`` together with its evaluated brightness."""
+
+        brightness = float(self.metric(state))
+        self.history.append((event, brightness))
+
+        if self.brightest_value is None or brightness > self.brightest_value:
+            self.brightest_value = brightness
+            self._brightest_state = dict(state)
+
+    @property
+    def is_radiant(self) -> bool:
+        """Return ``True`` once a brightness at or above ``shine_point`` is seen."""
+
+        return self.brightest_value is not None and self.brightest_value >= self.shine_point
+
+    def brightest_state(self) -> Optional[State]:
+        """Return a defensive copy of the brightest state encountered so far."""
+
+        if self._brightest_state is None:
+            return None
+        return dict(self._brightest_state)
+
+    def reset(self) -> None:
+        """Clear recorded information so the observer can be reused."""
+
+        self.history.clear()
+        self.brightest_value = None
+        self._brightest_state = None
+
+
 def peculiar_asymmetry(bingzi: Bingzi, pingzi: Pingzi) -> Optional[float]:
     """Return the temperature gap between ``Bingzi`` and ``Pingzi``.
 
@@ -231,6 +318,8 @@ def qianli_bingfeng(
 冰子 = Bingzi
 瓶子 = Pingzi
 平子 = PingziRelation
+明子 = Mingzi
+亮子 = Liangzi
 千里冰封 = qianli_bingfeng
 
 
@@ -238,10 +327,14 @@ __all__ = [
     "Bingzi",
     "Pingzi",
     "PingziRelation",
+    "Mingzi",
+    "Liangzi",
     "peculiar_asymmetry",
     "冰子",
     "瓶子",
     "平子",
+    "明子",
+    "亮子",
     "qianli_bingfeng",
     "千里冰封",
 ]
