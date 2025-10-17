@@ -92,6 +92,8 @@ from .bingzi import (
     Mingzi,
     Pingzi,
     Liangzi,
+    Weiliangzi,
+    Weimingzi,
     peculiar_asymmetry,
     qianli_bingfeng,
     冰子,
@@ -99,6 +101,8 @@ from .bingzi import (
     瓶子,
     明子,
     亮子,
+    未亮子,
+    未明子,
 )
 from .jizi import (
     Jizi,
@@ -119,6 +123,8 @@ from .bingzi import (
     Pingzi,
     PingziRelation,
     Liangzi,
+    Weiliangzi,
+    Weimingzi,
     peculiar_asymmetry,
     qianli_bingfeng,
     冰子,
@@ -127,6 +133,8 @@ from .bingzi import (
     平子,
     明子,
     亮子,
+    未亮子,
+    未明子,
 )
 from .sanzi import Sanzi, SanziOverview, Weizi, 三子, 维子
 from .siqianzi import (
