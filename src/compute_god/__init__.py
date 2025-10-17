@@ -22,6 +22,13 @@ from .core import (
     rule,
 )
 from .miyu import MiyuBond, bond_miyu
+from .miuchan import (
+    MiuchanBlueprint,
+    bond_miuchan,
+    miuchan_metric,
+    miuchan_universe,
+    run_miuchan_universe,
+)
 
 
 def _register_compat_module(name: str, **attrs: object) -> ModuleType:
@@ -284,6 +291,11 @@ __all__ = [
     "NoopObserver",
     "MiyuBond",
     "bond_miyu",
+    "MiuchanBlueprint",
+    "bond_miuchan",
+    "miuchan_metric",
+    "miuchan_universe",
+    "run_miuchan_universe",
     "EndlessAugust",
     "Bingzi",
     "Pingzi",
