@@ -32,6 +32,17 @@ STATION_BLUEPRINT: tuple[StationLayout, ...] = (
         ),
     ),
     (
+        "landscape",
+        "景观高度学习与扩散平衡。",
+        (
+            "LandscapeSample",
+            "LandscapeLearningParameters",
+            "initialise_grid",
+            "landscape_learning_universe",
+            "learn_landscape",
+        ),
+    ),
+    (
         "bonds",
         "Bond-building blueprints connecting Miyu and companions across universes.",
         (
