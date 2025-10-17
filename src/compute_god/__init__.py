@@ -62,6 +62,13 @@ from .momo import (
 from .screenshot import ScreenshotEnvironment, ScreenshotTheme
 from .github_feed import GitHubMobileFeed, IssueActivity, RepositoryCard, github_feed
 from .github_offline import OfflineGitHub, IssueNotFound, RepositoryNotFound, access_github
+from .landscape_learning import (
+    LandscapeLearningParameters,
+    LandscapeSample,
+    initialise_grid,
+    landscape_learning_universe,
+    learn_landscape,
+)
 
 
 def _register_compat_module(name: str, **attrs: object) -> ModuleType:
