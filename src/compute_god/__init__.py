@@ -302,6 +302,17 @@ from .touhou_project import (
     touhou_incident_universe,
     博丽灵梦下一解,
 )
+from .vulkan import (
+    DescriptorBinding,
+    DescriptorSetLayout,
+    RenderAttachment,
+    RenderPassBlueprint,
+    ShaderStageSpec,
+    VulkanDeviceProfile,
+    VulkanPipelinePlan,
+    VulkanValidationError,
+    plan_vulkan_pipeline,
+)
 from .s_follow_reading import (
     DEFAULT_FOLLOW_READING_STATE,
     FollowReadingBlueprint,
@@ -544,6 +555,21 @@ _STATION_LAYOUT = (
             "ThresholdSpace",
             "ThresholdOptimisationResult",
             "optimise_threshold_space",
+        ),
+    ),
+    (
+        "vulkan",
+        "Vulkan 渲染管线蓝图与调度规划。",
+        (
+            "DescriptorBinding",
+            "DescriptorSetLayout",
+            "RenderAttachment",
+            "RenderPassBlueprint",
+            "ShaderStageSpec",
+            "VulkanDeviceProfile",
+            "VulkanPipelinePlan",
+            "VulkanValidationError",
+            "plan_vulkan_pipeline",
         ),
     ),
     (
