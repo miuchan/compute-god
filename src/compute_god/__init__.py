@@ -31,6 +31,7 @@ from .miuchan import (
     miuchan_universe,
     run_miuchan_universe,
 )
+from .screenshot import ScreenshotEnvironment, ScreenshotTheme
 
 
 def _register_compat_module(name: str, **attrs: object) -> ModuleType:
@@ -762,3 +763,4 @@ for _, _, symbols in _STATION_LAYOUT:
         if symbol not in __all__:
             __all__.append(symbol)
 __all__.extend(["DeskStation", "GuidanceDesk", "GUIDANCE_DESK", "guidance_desk"])
+__all__.extend(["ScreenshotEnvironment", "ScreenshotTheme"])
