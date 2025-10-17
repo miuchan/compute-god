@@ -47,12 +47,21 @@ class InferenceRule:
 
 
 def _parse_implication(statement: Statement) -> Optional[Tuple[Statement, Statement]]:
-    if "->" not in statement:
+    """Parse ``A -> B`` implication statements.
+
+    The implementation intentionally favours the overwhelmingly common case
+    where a statement is *not* an implication: we look for the separator once
+    using :meth:`str.find` and immediately bail out if it is absent. This keeps
+    the hot path branch structure simple and predictable while still accepting
+    the same language as before.
+    """
+
+    arrow_index = statement.find("->")
+    if arrow_index == -1:
         return None
 
-    antecedent, consequent = statement.split("->", 1)
-    antecedent = antecedent.strip()
-    consequent = consequent.strip()
+    antecedent = statement[:arrow_index].strip()
+    consequent = statement[arrow_index + 2 :].strip()
     if not antecedent or not consequent:
         return None
     return antecedent, consequent
@@ -62,17 +71,16 @@ def modus_ponens(name: str = "modus-ponens") -> InferenceRule:
     """Construct a standard modus ponens inference rule."""
 
     def infer(known: Set[Statement]) -> Iterator[Tuple[Statement, Premises]]:
-        implications: List[Tuple[Statement, Statement, Statement]] = []
-        for stmt in known:
+        for stmt in tuple(known):
             parsed = _parse_implication(stmt)
             if parsed is None:
                 continue
-            antecedent, consequent = parsed
-            implications.append((stmt, antecedent, consequent))
 
-        for implication_stmt, antecedent, consequent in implications:
-            if antecedent in known and consequent not in known:
-                yield consequent, (implication_stmt, antecedent)
+            antecedent, consequent = parsed
+            if antecedent not in known or consequent in known:
+                continue
+
+            yield consequent, (stmt, antecedent)
 
     return InferenceRule(name=name, inference=infer)
 
