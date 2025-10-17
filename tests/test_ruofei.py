@@ -58,11 +58,13 @@ def test_ruofei_branch_prediction_tracks_history() -> None:
 
     # Starts weakly favouring the predicate branch.
     assert ruofei.predict_branch() == "predicate"
+    assert 0.5 < ruofei.branch_probability() < 1.0
 
     warm_state = {"flag": True, "value": -3}
     ruofei(warm_state)
     assert ruofei.last_branch() == "predicate"
     assert ruofei.predict_branch() == "predicate"
+    assert ruofei.branch_probability() > 0.6
 
     # Enough alternative invocations swing the prediction.
     cold_state = {"flag": False, "value": 4}
@@ -70,4 +72,5 @@ def test_ruofei_branch_prediction_tracks_history() -> None:
     ruofei(cold_state)
     assert ruofei.last_branch() == "alternative"
     assert ruofei.predict_branch() == "alternative"
+    assert ruofei.branch_probability() < 0.5
 

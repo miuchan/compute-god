@@ -19,6 +19,7 @@ branch fired.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from math import exp, log
 from typing import Callable, List, MutableMapping, Optional, Sequence, Tuple
 
 State = MutableMapping[str, object]
@@ -143,6 +144,10 @@ class Ruofei:
         default_factory=list, init=False
     )
     _branch_counter: int = field(default=2, init=False, repr=False)
+    _branch_weight: float = field(
+        default=log(0.7 / 0.3), init=False, repr=False
+    )  # weakly favour predicate
+    _learning_rate: float = field(default=1.0, init=False, repr=False)
 
     def evaluate(self, state: State, /) -> bool:
         """Evaluate the predicate and optional alternative for ``state``.
@@ -207,22 +212,42 @@ class Ruofei:
     def predict_branch(self) -> str:
         """Predict which branch is likely to execute next.
 
-        ``Ruofei`` keeps a tiny two-bit saturating counter that mirrors classic
-        CPU branch predictors.  It is incremented when the predicate branch
-        fires and decremented when the alternative branch runs.  Values above
-        or equal to ``2`` predict the predicate branch; lower values predict the
-        alternative.  The counter starts in a "weakly predicate" state so the
-        helper is optimistic about the primary predicate until history proves
-        otherwise.
+        ``Ruofei`` models its branch predictor as a single-parameter logistic
+        regression that is trained online using convex optimisation.  Each
+        branch evaluation produces a binary label (``1`` for the predicate
+        branch, ``0`` for the alternative).  The logistic loss is convex with
+        respect to the weight, so a simple gradient descent step refines the
+        predictor after every evaluation.  The predicted branch corresponds to
+        whichever side currently has probability at least 50 percent.
         """
 
-        return "predicate" if self._branch_counter >= 2 else "alternative"
+        return "predicate" if self._branch_probability() >= 0.5 else "alternative"
+
+    def branch_probability(self) -> float:
+        """Return the logistic probability of the predicate branch.
+
+        Values above ``0.5`` indicate that the predictor currently favours the
+        predicate branch.  The probability is derived from the internal weight
+        trained via convex optimisation and therefore reflects the entire
+        evaluation history in a smooth manner.
+        """
+
+        return self._branch_probability()
 
     def _update_branch_counter(self, branch: str) -> None:
-        if branch == "predicate":
-            self._branch_counter = min(self._branch_counter + 1, 3)
-        else:
-            self._branch_counter = max(self._branch_counter - 1, 0)
+        outcome = 1.0 if branch == "predicate" else 0.0
+        probability = self._branch_probability()
+        gradient = probability - outcome
+        self._branch_weight -= self._learning_rate * gradient
+
+        # Project the probabilistic predictor onto the historical two-bit
+        # counter so existing introspection behaviour remains stable.
+        updated_probability = self._branch_probability()
+        scaled = int(round(updated_probability * 3))
+        self._branch_counter = min(3, max(0, scaled))
+
+    def _branch_probability(self) -> float:
+        return 1.0 / (1.0 + exp(-self._branch_weight))
 
 
 # Chinese aliases embracing the playful API surface.
