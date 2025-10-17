@@ -127,6 +127,7 @@ print(result.state["term"])
 * [BUIDL in Public 宣言与执行节奏](docs/buidl-in-public.md)
 * [Heroism Universe：认清真相后依然热爱生活](docs/heroism-universe.md)
 * [在《我的世界》里实现「甜甜宇宙」](docs/tian-tian-universe-in-minecraft.md)
+* [《北京折叠》作为操作系统教材](docs/beijing-folded-operating-system-textbook.md)
 
 ---
 
