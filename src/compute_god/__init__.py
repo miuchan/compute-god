@@ -31,6 +31,18 @@ from .miuchan import (
     miuchan_universe,
     run_miuchan_universe,
 )
+from .intelligent_driving_lab import (
+    DrivingCapability,
+    DrivingScenario,
+    IntelligentDrivingLab,
+    InteractionModule,
+    LabSection,
+    build_intelligent_driving_lab,
+    find_capabilities_with_sensor,
+    iter_module_highlights,
+    lab_summary_table,
+    scenarios_covering_capability,
+)
 from .dongyun import (
     DongyunBlueprint,
     dongyun_map,
