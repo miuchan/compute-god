@@ -1,7 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Dict, Iterable, Iterator, List, MutableMapping, Optional, Sequence, Set, Tuple
+from typing import (
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+)
 
 from .core import FixpointResult, God, Observer, RuleContext, State, Universe, fixpoint, rule
 
@@ -227,3 +238,56 @@ def reconstruct_proof(state: MutableMapping[str, object], goal: Statement) -> Op
     if not steps or steps[-1].statement != goal:
         return None
     return Proof(goal=goal, steps=tuple(steps))
+
+
+def validate_proof(
+    proof: Proof,
+    *,
+    axioms: Sequence[Statement],
+    rules: Sequence[InferenceRule] | None = None,
+) -> bool:
+    """Check that ``proof`` is derivable from the given ``axioms``.
+
+    The validator replays the proof sequentially.  Each step must either be an
+    axiom already available in ``axioms`` or produced by one of the supplied
+    inference ``rules`` when applied to the statements proved so far.  The
+    function returns ``True`` precisely when the entire proof is consistent and
+    culminates in its declared goal.
+    """
+
+    if not proof.steps:
+        return False
+
+    if rules is None:
+        rules = (modus_ponens(),)
+
+    known: Set[Statement] = set(axioms)
+    rule_map = {rule.name: rule for rule in rules}
+
+    for step in proof.steps:
+        if step.rule == "axiom":
+            if step.statement not in known:
+                return False
+            continue
+
+        inference_rule = rule_map.get(step.rule)
+        if inference_rule is None:
+            return False
+
+        premises = step.premises
+        if any(premise not in known for premise in premises):
+            return False
+
+        candidate_known = set(known)
+        valid = False
+        for conclusion, produced_premises in inference_rule.infer(candidate_known):
+            if conclusion == step.statement and produced_premises == premises:
+                valid = True
+                break
+
+        if not valid:
+            return False
+
+        known.add(step.statement)
+
+    return proof.goal == proof.steps[-1].statement and proof.goal in known

@@ -2,9 +2,11 @@ import pytest
 
 from compute_god import (
     InferenceRule,
+    Proof,
     ProofStep,
     modus_ponens,
     reconstruct_proof,
+    validate_proof,
     run_theorem_prover,
     theorem_metric,
     theorem_proving_universe,
@@ -34,6 +36,12 @@ def test_theorem_prover_derives_goal_via_modus_ponens():
     derived_statements = {step.statement for step in modus_steps}
     assert "Q" in derived_statements
     assert "R" in derived_statements
+
+    assert validate_proof(
+        proof,
+        axioms=("P", "P -> Q", "Q -> R"),
+        rules=(modus_ponens(),),
+    )
 
 
 def test_theorem_metric_counts_statement_changes():
@@ -78,3 +86,16 @@ def test_custom_inference_rules_extend_reasoner():
     last_step: ProofStep = proof.steps[-1]
     assert last_step.statement == "bloom"
     assert last_step.premises == ("grow",)
+
+
+def test_validate_proof_rejects_invalid_derivation():
+    mp = modus_ponens()
+    bogus_proof = Proof(
+        goal="R",
+        steps=(
+            ProofStep(statement="P", rule="axiom", premises=()),
+            ProofStep(statement="R", rule=mp.name, premises=("P", "P -> R")),
+        ),
+    )
+
+    assert validate_proof(bogus_proof, axioms=("P",), rules=(mp,)) is False
