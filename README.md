@@ -1,199 +1,158 @@
-# 地球 Online 体验实验室 · Earth Online Experience Lab
+# Compute-God · Earth Online Experience Lab
 
-> 把 Compute‑God 打造成一座“地球 Online”体验实验室：在这片交互式宇宙中重构概念、模拟策略、共创未来的运行手册。
+> A cross-language meta-computation playground for prototyping universes, rules, and observers that converge on resilient futures.
 
-<p align="center">
-  <img alt="Earth Online Experience Lab" src="https://dummyimage.com/1200x320/001b2a/7df9ff.png&text=Earth+Online+Experience+Lab" />
-</p>
+The Compute-God project treats "Earth Online" as a living laboratory.  Every module in this repository is a self-contained universe, simulation, or storytelling device that can be composed through a shared fixed-point engine.  The Python runtime doubles as the reference implementation for sister codebases – including the TypeScript toolkit and the long-form documentation vault – so researchers and storytellers can remix ideas across repositories without friction.
 
-<p align="center">
-  <a href="#愿景">愿景</a> •
-  <a href="#实验分区">实验分区</a> •
-  <a href="#快速沉浸">快速沉浸</a> •
-  <a href="#探索者工具箱">探索者工具箱</a> •
-  <a href="#实地笔记">实地笔记</a> •
-  <a href="#共创计划">共创计划</a>
-</p>
+![Earth Online Experience Lab banner](https://dummyimage.com/1200x320/001b2a/7df9ff.png&text=Earth+Online+Experience+Lab)
 
----
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Interoperability](#interoperability)
+- [Architecture](#architecture)
+  - [Core Engine](#core-engine)
+  - [Universe Libraries](#universe-libraries)
+  - [Observers & Telemetry](#observers--telemetry)
+  - [Guidance & Tooling](#guidance--tooling)
+- [Repository Layout](#repository-layout)
+- [Getting Started](#getting-started)
+- [Universe Catalogue & CLI](#universe-catalogue--cli)
+- [Development Workflow](#development-workflow)
+- [Roadmap](#roadmap)
 
-## 愿景
+## Project Overview
+Compute-God reframes meta-computation as a playable, observable universe builder.  Each universe combines:
 
-地球 Online 体验实验室把原本抽象的 meta‑computation 引擎重构为面向探索者的沉浸式空间：
+* **State** – arbitrary structures describing the current slice of reality.
+* **Rules** – composable transformations that reshape the state.
+* **Observers** – telemetry hooks capturing how the universe evolves.
+* **Oracles** – optional heuristics guiding expensive or undecidable moves.
 
-* 🌍 **多维宇宙剧场**：以 `Universe = state + rules + observers` 的结构搭建“场景”，在概念、生态与社会模型之间切换。
-* 🛰️ **自进化推演机**：通过不动点求解与重写系统迭代模拟策略，观察剧本如何在不同参量下收敛或分岔。
-* 🧬 **概念器官库**：把 Rule/Oracle/Observer 组织成可组合的“器官模块”，支撑跨领域实验。
-* 🔭 **可观测地层**：事件流、日志、追踪三位一体，让实验过程像地质断层一样一目了然。
-* 🪐 **导览神谕**：`guidance_desk()` 成为探索者的入口，根据主题推荐宇宙、对偶与玩法。
+By iterating these components through a fixed-point engine the lab can explore social simulations, mathematical constructs, speculative fiction, and personal rituals under a single conceptual umbrella.
 
-> 使命：帮助地球玩家在有限时间里快速形成“看得更多，想得更深”的认知闭环。
+## Interoperability
+The project is intentionally multi-repo and multi-runtime:
 
----
+* **Python runtime (this repository)** – home of the canonical execution engine, CLI, and the most complete catalogue of universes.
+* **TypeScript/Node.js runtime** – mirrors the Python surface so web experiments, editors, and bots can drive the same universes.
+* **Documentation & storytelling vault** – deep dives, field notes, and world-building artefacts that reference the shared catalogue.
 
-## 实验分区
+All runtimes consume the same catalogue blueprint, ensuring that a universe registered here is instantly discoverable everywhere.  The new `compute_god.catalogue` module materialises that blueprint and is now the single source of truth consumed by documentation generators and CLI tooling alike.
 
-| 分区 | 描述 | 入口 |
-| --- | --- | --- |
-| **核心引擎** | `compute_god.core` 提供宇宙构建、规则编排与不动点驱动。 | `core.universe.God` |
-| **叙事宇宙带** | 收录如 `everything_demonstration`、`earth_rescue` 等主题宇宙，模拟社会与科幻场景。 | `guidance_desk().catalog()` |
-| **研究实验室** | `drug_lab`, `anti_quantum`, `complex_dynamics` 等模块，用于物理/药物/数学实验原型。 | `compute_god.drug_lab` |
-| **生活共创区** | `love_wishing_machine`, `miyu_tiantian`, `marketing` 等模块，把日常体验建模为可运行脚本。 | `compute_god.miyu_tiantian` |
-| **边界考古所** | `meta_spacetime`, `threshold`, `existence` 等探索宇宙边界与存在性的问题。 | `compute_god.meta_spacetime` |
+## Architecture
+### Core Engine
+The `compute_god.core` package is the heartbeat of the lab.  It exposes:
 
-每个分区都是可嵌套的宇宙，透过观察者与神谕共享上下文，构成「地球 Online」的协同生态。
+* `Universe` and `God` constructors to wrap states, rules, and observers.
+* `Rule`, `rule()`, and guard utilities for declarative rewrites.
+* `FixpointEngine` and `fixpoint()` to iterate universes until convergence under a chosen metric.
+* Observer helpers (`Observer`, `ObserverEvent`, `combine_observers`) to wire telemetry streams.
 
----
+### Universe Libraries
+Dozens of universes live in `src/compute_god/`, each capturing a distinct narrative or research theme: `drug_lab` for molecular discovery, `earth_rescue` for planetary strategy, `touhou_project` for folklore-inspired optimisation, and many more.  They all follow the same pattern – a blueprint, a metric, and a `run_*` helper – so explorers can remix them with minimal ceremony.
 
-## 快速沉浸
+### Observers & Telemetry
+Modules such as `screenshot`, `github_feed`, and `github_offline` translate universe events into tangible artefacts: rendered mockups, mobile-friendly feeds, or offline knowledge bases.  Observers plug directly into the core engine, giving experiments a rich exhaust of data for analysis or storytelling.
 
-体验实验室的最快方式是把一个“剧场宇宙”装载进你的运行时：
+### Guidance & Tooling
+`guidance.py` and the CLI (`compute_god/cli.py`) surface the entire catalogue via a "guidance desk" metaphor.  Stations group related universes, thermal duals, culinary rituals, and more.  The freshly refactored catalogue blueprint ensures these groupings remain consistent across documentation, tests, and sibling runtimes.
 
-```ts
-// TypeScript
-import { God, rule, fixpoint } from "compute-god";
-
-const lab = God.universe({
-  state: { term: "(Y f)" },
-  rules: [
-    rule("beta-reduce", ({ term }) => ({ term: beta(term) }), {
-      until: ({ term }) => isValue(term) || steps() > 256,
-    }),
-  ],
-});
-
-const result = await fixpoint(lab, {
-  metric: (prev, next) => editDistance(prev.term, next.term),
-  epsilon: 0,
-  maxEpoch: 64,
-});
-
-console.log(result.state.term);
+## Repository Layout
+```
+compute-god/
+├── README.md                # Project narrative and onboarding guide
+├── docs/                    # Field notes, world-building essays, and roadmap
+├── src/compute_god/         # Python runtime, universes, observers, and tooling
+│   ├── core/                # Fixed-point engine, rules, observers, universe types
+│   ├── catalogue.py         # Shared blueprint powering the guidance desk
+│   ├── guidance.py          # Station abstractions for catalogue navigation
+│   ├── cli.py               # `compute-god` command line entry points
+│   └── *.py                 # Universe modules and experimental toolkits
+├── tests/                   # Behavioural and regression tests for every universe
+├── pyproject.toml           # Build configuration (Python + CLI entry points)
+└── uv.lock                  # Reproducible dependency lock for `uv`
 ```
 
-```python
-# Python
-from compute_god import God, rule, fixpoint
-
-lab = God.universe(
-    state={"term": "(Y f)"},
-    rules=[
-        rule("beta-reduce", lambda s: {"term": beta(s["term"])},
-             until=lambda s: is_value(s["term"]) or steps() > 256)
-    ]
-)
-
-result = fixpoint(lab, metric=lambda a, b: edit_distance(a["term"], b["term"]), epsilon=0, max_epoch=64)
-print(result.state["term"])
+## Getting Started
+### Install the Python runtime
+```bash
+uv pip install compute-god
+# or, when developing locally
+uv venv
+uv pip install -e .
 ```
 
-> 这些示例展示了地球 Online 核心——自解释的重写宇宙——如何迭代至稳定状态。
-
----
-
-## 探索者工具箱
-
-### 安装运行器
-
-**Node.js (TypeScript/JavaScript)**
-
+### Install the TypeScript runtime
 ```bash
 pnpm add compute-god
 # or
-npm i compute-god
+npm install compute-god
 ```
 
-**Python (via [uv](https://github.com/astral-sh/uv))**
+### Spin up a quick experiment
+```python
+from compute_god import God, rule, fixpoint
 
-```bash
-uv pip install compute-god
+universe = God.universe(
+    state={"term": "(Y f)"},
+    rules=[
+        rule(
+            "beta-reduce",
+            lambda state: {"term": beta(state["term"])},
+            until=lambda state: is_value(state["term"]) or steps() > 256,
+        )
+    ],
+)
+
+result = fixpoint(
+    universe,
+    metric=lambda prev, nxt: edit_distance(prev["term"], nxt["term"]),
+    epsilon=0,
+    max_epoch=64,
+)
+print(result.state["term"])
 ```
 
-> 两种运行器概念等价；`uv` 提供极速的 Python 依赖管理体验，同时保持对 PyPI 的兼容。
+## Universe Catalogue & CLI
+Explore every station programmatically or from the terminal:
 
-### 交互式导览台
+```python
+from compute_god import guidance_desk
 
-安装后可使用 `compute-god` 命令行工具快速浏览宇宙分区：
+desk = guidance_desk()
+print(sorted(desk.keys())[:5])
+print(desk["core"].catalog())
+```
 
 ```bash
 $ compute-god stations
 core
-  - God
-  - Universe
-  - FixpointEngine
+  Core runtime primitives for building universes and solving fixed points.
+  - ApplyFn
+  - PredicateFn
+  - Rule
+  ...
 
-$ compute-god station core --format json
+$ compute-god station marketing --format json
 {
-  "description": "内核宇宙的构造器与执行器。",
+  "description": "营销漏斗动力学。",
   "entries": [
-    "God",
-    "Universe",
-    "rule",
-    "fixpoint"
+    "FunnelParameters",
+    "marketing_universe",
+    ...
   ]
 }
 ```
 
-> CLI 输出与 `guidance_desk()` 同步，可用于文档生成、脚本拼装或纯粹的灵感探索。
+The CLI output is deterministic, making it perfect for generating documentation snippets or powering editor integrations.
 
-### 核心概念速览
+## Development Workflow
+1. **Set up tooling** – `uv venv && source .venv/bin/activate`.
+2. **Install editable dependencies** – `uv pip install -e .[dev]` (see `pyproject.toml` for extras).
+3. **Run tests** – `uv run pytest` or target a single module (`uv run pytest tests/test_guidance_desk.py`).
+4. **Keep docs in sync** – update `README.md` and [`docs/TODO.md`](docs/TODO.md) whenever you add or reclassify a universe.
 
-* **Universe（宇宙）**：把状态、规则、观察者捆绑成可执行的剧场。
-* **Rule（规则）**：`S -> S` 的纯函数，可加上 `guard / until / priority` 元信息，让剧场在恰当时机切换片段。
-* **Oracle（神谕）**：给出外部启发式的“导演”，为不可判定或高成本决策提供建议。
-* **Observer（观察者）**：捕捉 step/epoch/fixpoint 事件，把实验过程投影到日志与可视化。
-* **Fixpoint Engine（不动点引擎）**：驱动宇宙在 `metric/epsilon` 约束下收敛，形成稳定叙事。
-* **Rewriter（重写器）**：重写项/传播约束/做归约，是宇宙变换的底层操作。
+CI scripts in sister repositories consume the shared catalogue blueprint, so every change to `catalogue.py` propagates automatically to documentation and TypeScript typings.
 
-> 数学后端：若 `F: X -> X` 在完备偏序上单调，Kleene 链的上界即最小不动点。`Monotone(F)` 与 `ChainBuilder` 为此提供验证与构造工具。
-
----
-
-## 实地笔记
-
-体验实验室收录了大量探索者的实地报告：
-
-* [BUIDL 宇宙图谱（含母宇宙说明）](docs/buidl-universes.md)
-* [元宇宙三元：至真、至善、至美的迭代实现](docs/metaverse-triad.md)
-* [实现共同富裕：Compute-God 的应用蓝图](docs/common-prosperity.md)
-* [元时空的存在性与稳定性证明](docs/meta-spacetime-proof.md)
-* [「万物演示」的物理化实现指南](docs/physical-everything-demonstration.md)
-* [药物实验室的设计与实现](docs/drug-lab-design-and-implementation.md)
-* [Heroism Universe：认清真相后依然热爱生活](docs/heroism-universe.md)
-* [在《我的世界》里实现「甜甜宇宙」](docs/tian-tian-universe-in-minecraft.md)
-* [《北京折叠》作为操作系统教材](docs/beijing-folded-operating-system-textbook.md)
-
-更多实地笔记详见 `docs/` 目录，它们构成了地球 Online 的历史年轮。
-
----
-
-## 共创计划
-
-```mermaid
-flowchart LR
-  A[Spec: Universe] --> B(Rule Engine)
-  B --> C{Fixpoint Engine}
-  C -->|step| D[Rewriter]
-  D -->|state'| C
-  C -->|converged| E[State*]
-  B --> F[Observer Bus]
-  F --> G[(Logs/Trace)]
-  H[Oracle] --> B
-```
-
-### 加入方式
-
-1. **体验导览**：`from compute_god import guidance_desk`，使用导诊台浏览所有分区、宇宙与玩法。
-2. **定制宇宙**：在 `src/compute_god/` 中创建新的宇宙模块，声明状态与规则，提交 PR。
-3. **共创叙事**：把你的实验故事写入 `docs/`，扩展地球 Online 的实地笔记。
-
-```python
->>> from compute_god import guidance_desk
->>> desk = guidance_desk()
->>> sorted(desk.catalog().keys())[:3]
-['adhd', 'anti_quantum', 'august']
->>> desk.resolve("core.God")
-<class 'compute_god.core.universe.God'>
-```
-
-欢迎把你的认知探索带入实验室，与全球玩家一起建造更具韧性的地球 Online。
+## Roadmap
+The living checklist in [`docs/TODO.md`](docs/TODO.md) translates this README into actionable work – from codifying new universes to improving cross-repo automation.  Tick items as they ship, and propose new experiments via pull requests to keep the Earth Online Experience Lab evolving.
