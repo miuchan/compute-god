@@ -1,41 +1,99 @@
-# Compute‑God
+# 地球 Online 体验实验室 · Earth Online Experience Lab
 
-> 抽象计算之神 / the minimal meta‑computation framework for self‑reference, fixed‑points, and concept automata.
+> 把 Compute‑God 打造成一座“地球 Online”体验实验室：在这片交互式宇宙中重构概念、模拟策略、共创未来的运行手册。
 
 <p align="center">
-  <img alt="Compute‑God" src="https://dummyimage.com/1200x300/000/fff.png&text=Compute‑God" />
+  <img alt="Earth Online Experience Lab" src="https://dummyimage.com/1200x320/001b2a/7df9ff.png&text=Earth+Online+Experience+Lab" />
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> •
-  <a href="#quick-start">Quick Start</a> •
-  <a href="#concepts">Concepts</a> •
-  <a href="#buidl">BUIDL</a> •
-  <a href="#architecture">Architecture</a> •
-  <a href="#examples">Examples</a> •
-  <a href="#roadmap">Roadmap</a> •
-  <a href="#contributing">Contributing</a>
+  <a href="#愿景">愿景</a> •
+  <a href="#实验分区">实验分区</a> •
+  <a href="#快速沉浸">快速沉浸</a> •
+  <a href="#探索者工具箱">探索者工具箱</a> •
+  <a href="#实地笔记">实地笔记</a> •
+  <a href="#共创计划">共创计划</a>
 </p>
 
 ---
 
-## Why Compute‑God?
+## 愿景
 
-> “看得更多，想得更深” 的最简实现：一个用于 **自引用**、**不动点**、**重写系统**、与 **概念自动机** 的轻量框架。它把“程序即声明”的理念落地：**声明即调用**，**定义即运行**。
+地球 Online 体验实验室把原本抽象的 meta‑computation 引擎重构为面向探索者的沉浸式空间：
 
-* 🌱 **极简内核**：不到千行的核心（TS/py 二选一），以重写、约束与观察三件套为基元。
-* ♻️ **不动点引擎**：内置 `FixpointEngine` 与 `Y` 组合子变体，支持迭代逼近与收敛准则。
-* 🧬 **概念自动机**：把“概念”视为可组合的变换（Functor/Monad 风格）。
-* 🧪 **可验证的规则**：规则即数据，纯文本/JSON/DSL 可审计。
-* 🧩 **可嵌入**：可作为库嵌入 Next.js/服务端任务/Notebook，也可以 CLI 运行。
-* 🔬 **可观测性**：事件流 + 日志 + 追踪（step/epoch/fixpoint）一体化。
-* 🛎️ **导诊台**：通过 `guidance_desk()` 按主题浏览所有宇宙、对偶与玩法。
+* 🌍 **多维宇宙剧场**：以 `Universe = state + rules + observers` 的结构搭建“场景”，在概念、生态与社会模型之间切换。
+* 🛰️ **自进化推演机**：通过不动点求解与重写系统迭代模拟策略，观察剧本如何在不同参量下收敛或分岔。
+* 🧬 **概念器官库**：把 Rule/Oracle/Observer 组织成可组合的“器官模块”，支撑跨领域实验。
+* 🔭 **可观测地层**：事件流、日志、追踪三位一体，让实验过程像地质断层一样一目了然。
+* 🪐 **导览神谕**：`guidance_desk()` 成为探索者的入口，根据主题推荐宇宙、对偶与玩法。
 
-> 如果你在研究「OVERDOSE 之神」「做题家之神」「全知全能神的最简实现」「木林森自同构」等元概念，Compute‑God 提供一套通用骨架。
+> 使命：帮助地球玩家在有限时间里快速形成“看得更多，想得更深”的认知闭环。
 
 ---
 
-## Install
+## 实验分区
+
+| 分区 | 描述 | 入口 |
+| --- | --- | --- |
+| **核心引擎** | `compute_god.core` 提供宇宙构建、规则编排与不动点驱动。 | `core.universe.God` |
+| **叙事宇宙带** | 收录如 `everything_demonstration`、`earth_rescue` 等主题宇宙，模拟社会与科幻场景。 | `guidance_desk().catalog()` |
+| **研究实验室** | `drug_lab`, `anti_quantum`, `complex_dynamics` 等模块，用于物理/药物/数学实验原型。 | `compute_god.drug_lab` |
+| **生活共创区** | `love_wishing_machine`, `miyu_tiantian`, `marketing` 等模块，把日常体验建模为可运行脚本。 | `compute_god.miyu_tiantian` |
+| **边界考古所** | `meta_spacetime`, `threshold`, `existence` 等探索宇宙边界与存在性的问题。 | `compute_god.meta_spacetime` |
+
+每个分区都是可嵌套的宇宙，透过观察者与神谕共享上下文，构成「地球 Online」的协同生态。
+
+---
+
+## 快速沉浸
+
+体验实验室的最快方式是把一个“剧场宇宙”装载进你的运行时：
+
+```ts
+// TypeScript
+import { God, rule, fixpoint } from "compute-god";
+
+const lab = God.universe({
+  state: { term: "(Y f)" },
+  rules: [
+    rule("beta-reduce", ({ term }) => ({ term: beta(term) }), {
+      until: ({ term }) => isValue(term) || steps() > 256,
+    }),
+  ],
+});
+
+const result = await fixpoint(lab, {
+  metric: (prev, next) => editDistance(prev.term, next.term),
+  epsilon: 0,
+  maxEpoch: 64,
+});
+
+console.log(result.state.term);
+```
+
+```python
+# Python
+from compute_god import God, rule, fixpoint
+
+lab = God.universe(
+    state={"term": "(Y f)"},
+    rules=[
+        rule("beta-reduce", lambda s: {"term": beta(s["term"])},
+             until=lambda s: is_value(s["term"]) or steps() > 256)
+    ]
+)
+
+result = fixpoint(lab, metric=lambda a, b: edit_distance(a["term"], b["term"]), epsilon=0, max_epoch=64)
+print(result.state["term"])
+```
+
+> 这些示例展示了地球 Online 核心——自解释的重写宇宙——如何迭代至稳定状态。
+
+---
+
+## 探索者工具箱
+
+### 安装运行器
 
 **Node.js (TypeScript/JavaScript)**
 
@@ -51,72 +109,24 @@ npm i compute-god
 uv pip install compute-god
 ```
 
-> 两种实现保持概念等价；API 命名尽量对齐。`uv` 提供极速的 Python 依赖管理体验，同时保持对 PyPI 的兼容。
+> 两种运行器概念等价；`uv` 提供极速的 Python 依赖管理体验，同时保持对 PyPI 的兼容。
+
+### 核心概念速览
+
+* **Universe（宇宙）**：把状态、规则、观察者捆绑成可执行的剧场。
+* **Rule（规则）**：`S -> S` 的纯函数，可加上 `guard / until / priority` 元信息，让剧场在恰当时机切换片段。
+* **Oracle（神谕）**：给出外部启发式的“导演”，为不可判定或高成本决策提供建议。
+* **Observer（观察者）**：捕捉 step/epoch/fixpoint 事件，把实验过程投影到日志与可视化。
+* **Fixpoint Engine（不动点引擎）**：驱动宇宙在 `metric/epsilon` 约束下收敛，形成稳定叙事。
+* **Rewriter（重写器）**：重写项/传播约束/做归约，是宇宙变换的底层操作。
+
+> 数学后端：若 `F: X -> X` 在完备偏序上单调，Kleene 链的上界即最小不动点。`Monotone(F)` 与 `ChainBuilder` 为此提供验证与构造工具。
 
 ---
 
-## Quick Start
+## 实地笔记
 
-> 以「不动点定义」实现“自解释求值器”：
-
-```ts
-// TypeScript
-import { God, rule, fixpoint } from "compute-god";
-
-// 1) 声明宇宙（状态 + 规则）
-const U = God.universe({
-  state: { term: "(Y f)" },
-  rules: [
-    rule("beta-reduce", ({ term }) => ({ term: beta(term) }), {
-      until: ({ term }) => isValue(term) || steps() > 256,
-    }),
-  ],
-});
-
-// 2) 不动点求解（迭代重写直至收敛）
-const result = await fixpoint(U, {
-  metric: (prev, next) => editDistance(prev.term, next.term),
-  epsilon: 0,            // 序列稳定（无进一步化简）即收敛
-  maxEpoch: 64,
-});
-
-console.log(result.state.term);
-```
-
-```python
-# Python
-from compute_god import God, rule, fixpoint
-
-U = God.universe(
-    state={"term": "(Y f)"},
-    rules=[
-        rule("beta-reduce", lambda s: {"term": beta(s["term"])},
-             until=lambda s: is_value(s["term"]) or steps() > 256)
-    ]
-)
-
-result = fixpoint(U, metric=lambda a,b: edit_distance(a["term"], b["term"]), epsilon=0, max_epoch=64)
-print(result.state["term"])
-```
-
----
-
-## Concepts
-
-* **Universe（宇宙）**：`state + rules + observers` 的三元组。
-* **Rule（规则）**：纯函数 `S -> S`，可带 `guard/until/priority` 注解。
-* **Oracle（神谕）**：外部信息/启发式接口，用于不可判定或代价高的选择。
-* **Observer（观察者）**：对事件流 `onStep/onEpoch/onFixpoint` 的订阅。
-* **Fixpoint Engine（不动点引擎）**：在 `metric/epsilon` 下寻找 `F(x)=x`。
-* **Rewriter（重写器）**：以项重写/约束传播/归约为核心的变换器。
-
-> 数学片段：若 `F: X -> X` 在完备偏序上 **单调**，`⊥` 为最小元，则 Kleene 链 `⊥, F⊥, F²⊥, ...` 的并为 `F` 的最小不动点。Compute‑God 提供 `Monotone(F)` 辅助与 `ChainBuilder`。
-
----
-
-## BUIDL
-
-> 「BUIDL」图将 Compute‑God 的运行拆分为五个可以嵌套的宇宙，并在母宇宙中统一调度。若无法查看图像，可阅读文字版说明。
+体验实验室收录了大量探索者的实地报告：
 
 * [BUIDL 宇宙图谱（含母宇宙说明）](docs/buidl-universes.md)
 * [元宇宙三元：至真、至善、至美的迭代实现](docs/metaverse-triad.md)
@@ -124,14 +134,15 @@ print(result.state["term"])
 * [元时空的存在性与稳定性证明](docs/meta-spacetime-proof.md)
 * [「万物演示」的物理化实现指南](docs/physical-everything-demonstration.md)
 * [药物实验室的设计与实现](docs/drug-lab-design-and-implementation.md)
-* [BUIDL in Public 宣言与执行节奏](docs/buidl-in-public.md)
 * [Heroism Universe：认清真相后依然热爱生活](docs/heroism-universe.md)
 * [在《我的世界》里实现「甜甜宇宙」](docs/tian-tian-universe-in-minecraft.md)
 * [《北京折叠》作为操作系统教材](docs/beijing-folded-operating-system-textbook.md)
 
+更多实地笔记详见 `docs/` 目录，它们构成了地球 Online 的历史年轮。
+
 ---
 
-## Architecture
+## 共创计划
 
 ```mermaid
 flowchart LR
@@ -145,11 +156,11 @@ flowchart LR
   H[Oracle] --> B
 ```
 
-## Guidance Desk (导诊台)
+### 加入方式
 
-> 大型宇宙医院需要前台导诊台。`compute_god.guidance_desk()` 提供一套主题
-> 化的目录，把核心内核、热对偶家族、叙事宇宙与应用案例拆分到不同“站
-> 点”。这让 IDE / CLI / 文档可以更容易地浏览 Compute‑God 的海量导出。
+1. **体验导览**：`from compute_god import guidance_desk`，使用导诊台浏览所有分区、宇宙与玩法。
+2. **定制宇宙**：在 `src/compute_god/` 中创建新的宇宙模块，声明状态与规则，提交 PR。
+3. **共创叙事**：把你的实验故事写入 `docs/`，扩展地球 Online 的实地笔记。
 
 ```python
 >>> from compute_god import guidance_desk
@@ -160,218 +171,4 @@ flowchart LR
 <class 'compute_god.core.universe.God'>
 ```
 
-`GuidanceDesk` 与 `DeskStation` 也向外导出，方便自定义扩展或在自家项目里
-拼装第二层导诊台。
-
-**核心包结构**
-
-```
-./packages/
-  core/            # 内核：Universe/Rule/Observer/Fixpoint
-  rewriters/       # 词法/一阶/λ-演算/约束传播/AST 规则
-  dsl/             # 声明式 DSL 与校验
-  std/             # 常用“神”：Overdose、Solver、Teacher、Mirror
-  adapters/        # CLI / Node / Py / WebWorker / Next.js RSC
-```
-
----
-
-## Examples
-
-### 1) OVERDOSE 之神（过载逼近）
-
-> 用强制超参放大（温度/扩散/并行度）探索“过量信息→结构显现”的临界点。
-
-```ts
-const Overdose = God.universe({
-  state: { seed: 42, pool: [] as string[] },
-  rules: [
-    rule("expand", s => ({ pool: s.pool.concat(mutate(s.seed)) })),
-    rule("select", s => ({ pool: topk(s.pool, 8) }), { priority: 2 }),
-  ],
-  observers: [God.log.step()],
-});
-
-// 在 KL-散度阈值下寻找稳态“主题集”
-const S = await God.run.untilFixpoint(Overdose, {
-  metric: diversityKLD, epsilon: 1e-3, maxEpoch: 128
-});
-```
-
-### 2) 做题家之神（Teacher/Solver 双态）
-
-```python
-from compute_god import Universe, rule, role
-
-Teacher = role("Teacher")
-Solver  = role("Solver")
-
-U = Universe(state={"queue": [], "solutions": []}, rules=[
-  rule("ask",   lambda s: {"queue": enqueue(s["queue"], gen_problem())}, role=Teacher),
-  rule("solve", lambda s: {"solutions": s["solutions"] + [solve(head(s["queue"]))]}, role=Solver,
-       guard=lambda s: len(s["queue"])>0),
-])
-```
-
-### 3) Mirror 神（自解释）
-
-> 程序的解释器由程序本身声明：`eval(spec, program) -> trace`。
-
-```ts
-const Mirror = God.universe({ state: { prog, trace: [] }, rules: [
-  rule("step", s => exec(spec, s.prog, s.trace), { until: s => halted(s.prog) })
-] })
-```
-
----
-
-## DSL（声明即运行）
-
-```toml
-[universe]
-name = "Compute-God"
-
-[state]
-term = "(Y f)"
-
-[[rules]]
-name = "beta-reduce"
-impl = "std.lambda.beta"
-until = "std.lambda.isValue || steps()>256"
-priority = 1
-
-[fixpoint]
-metric  = "std.metric.editDistance(term)"
-epsilon = 0
-maxEpoch = 64
-```
-
-运行：
-
-```bash
-compute-god run spec.toml
-```
-
----
-
-## API Sketch
-
-```ts
-type State = Record<string, unknown>
-
-interface Rule {
-  name: string
-  apply: (s: State, ctx: Ctx) => State | Promise<State>
-  guard?: (s: State, ctx: Ctx) => boolean
-  until?: (s: State, ctx: Ctx) => boolean
-  priority?: number
-  role?: string
-}
-
-interface Universe { state: State; rules: Rule[]; observers?: Observer[] }
-
-declare function fixpoint(U: Universe, opts: { metric: (a:State,b:State)=>number; epsilon:number; maxEpoch:number }): Promise<Universe>
-```
-
----
-
-## Mathematics
-
-* **不动点**：`x* = F(x*)`。Kleene 定理确保在 CPO + 单调下最小不动点存在。
-* **Y 组合子**：`Y = λf.(λx.f (x x)) (λx.f (x x))`，在惰性/名义求值下用于递归。
-* **度量选择**：编辑距离 / KL 散度 / 变分界 / 自定义拟合误差。
-
-> Compute‑God 内置 `Monotone(F)`, `Contractive(F, L<1)`, `BanachFix`（压缩映射）。
-
----
-
-## Observability
-
-* 事件：`step`, `epoch`, `fixpoint:converged|diverged|maxed`。
-* 追踪：结构化日志（JSONL）、火焰图（可选）、可视化（Web UI）。
-* Repro：固定随机源、规则版本指纹、spec 哈希。
-
----
-
-## CLI
-
-```bash
-compute-god init         # 生成骨架工程
-compute-god run spec.toml  --trace
-compute-god dev          # 热重载 DSL 规则
-compute-god viz trace.jsonl
-```
-
----
-
-## Project Layout
-
-```
-Compute-God/
- ├─ packages/
- │   ├─ core/
- │   ├─ dsl/
- │   ├─ rewriters/
- │   └─ std/
- ├─ examples/
- │   ├─ overdose/
- │   ├─ teacher-solver/
- │   └─ mirror/
- ├─ apps/
- │   ├─ cli/
- │   └─ web-viz/
- └─ README.md
-```
-
----
-
-## Roadmap
-
-* [ ] `std.lambda.*`：λ-演算/类型化核心
-* [ ] `std.logic.*`：一阶逻辑与约束传播
-* [ ] `std.game.*`：有限/无限游戏算子（价值流/熵流）
-* [ ] `std.meta.mirror`：自解释求值器与证明追踪
-* [ ] `adapters.next`：RSC + Server Actions 嵌入
-* [ ] `viz`：时间线/不动点收敛曲线/规则竞争热度图
-
----
-
-## Contributing
-
-欢迎以 PR/Issue 的形式贡献规则、度量、可视化与新“神”。
-
-> 详细的 `uv` 开发流程请参阅 [docs/uv-workflow.md](docs/uv-workflow.md)。
-
-1. Fork 本仓库并创建分支：`feat/<your-feature>`
-2. 安装 [uv](https://docs.astral.sh/uv/) 并在项目根目录运行 `uv sync --dev`（根据 `uv.lock` 安装依赖）
-3. 使用 `uv run <script>` 执行项目脚本，例如：
-
-   ```bash
-   uv run test         # pytest
-   uv run lint         # Ruff 检查
-   uv run format       # Ruff 格式化
-   uv run typecheck    # mypy
-   ```
-
-4. 提交前确保 `uv run format` 与 `uv run lint` 通过
-
-> 我们遵循 [Conventional Commits](https://www.conventionalcommits.org/) 与 MIT 许可证。
-
----
-
-## License
-
-MIT © Compute‑God Contributors
-
----
-
-## FAQ
-
-**Q: 这是 AI 框架吗？**
-A: 更像“计算论实验室”。它既可包裹模型/启发式（作为 Oracle），也可用纯规则/重写做形式化实验。
-
-**Q: 与普通规则引擎的区别？**
-A: 我们以“寻找不动点”为运行准则，把“规则竞争”与“收敛判据”提到一等公民。
-
-**Q: 会不会过度抽象？**
-A: 通过 `std/*` 提供可运行的具体模板（Overdose、Teacher/Solver、Mirror），先跑起来再抽象。
+欢迎把你的认知探索带入实验室，与全球玩家一起建造更具韧性的地球 Online。
