@@ -20,12 +20,30 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Mapping, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Tuple, TYPE_CHECKING
 
-from PIL import Image, ImageDraw, ImageFont
+try:  # pragma: no cover - import guard
+    from PIL import Image, ImageDraw, ImageFont
+except ModuleNotFoundError as exc:  # pragma: no cover - exercised in environments without Pillow
+    Image = ImageDraw = ImageFont = None  # type: ignore[assignment]
+    _PIL_IMPORT_ERROR = exc
+else:  # pragma: no cover - module import is trivial to test indirectly
+    _PIL_IMPORT_ERROR = None
+
+if TYPE_CHECKING:  # pragma: no cover - typing helper
+    from PIL import Image as PILImage
+else:
+    PILImage = Any
 
 RGBColour = Tuple[int, int, int]
 Bounds = Tuple[int, int, int, int]
+
+
+def _require_pillow() -> None:
+    if _PIL_IMPORT_ERROR is not None:
+        raise ModuleNotFoundError(
+            "Pillow is required to use ScreenshotEnvironment; install compute-god[image]"
+        ) from _PIL_IMPORT_ERROR
 
 
 def _parse_colour(value: str) -> RGBColour:
@@ -98,9 +116,10 @@ class ScreenshotEnvironment:
     theme: ScreenshotTheme = field(default_factory=ScreenshotTheme)
     _palette: Dict[str, RGBColour] = field(init=False, repr=False)
     _layout: Dict[str, Bounds] = field(default_factory=dict, init=False, repr=False)
-    _last_image: Optional[Image.Image] = field(default=None, init=False, repr=False)
+    _last_image: Optional[PILImage] = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
+        _require_pillow()
         if self.width <= 0 or self.height <= 0:
             raise ValueError("Screenshot dimensions must be positive")
 
@@ -125,6 +144,7 @@ class ScreenshotEnvironment:
     def render(self) -> Image.Image:
         """Render the screenshot layout and return a Pillow image."""
 
+        _require_pillow()
         self._layout = {}
         image = Image.new("RGB", (self.width, self.height), self._palette["background"])
         draw = ImageDraw.Draw(image)
@@ -140,6 +160,7 @@ class ScreenshotEnvironment:
     def save(self, path: Path | str, image: Optional[Image.Image] = None) -> Path:
         """Render (if needed) and persist the screenshot to ``path``."""
 
+        _require_pillow()
         target = Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)
 
@@ -155,6 +176,7 @@ class ScreenshotEnvironment:
     def verify(self, image: Optional[Image.Image] = None) -> bool:
         """Return ``True`` when ``image`` matches key layout expectations."""
 
+        _require_pillow()
         if image is None:
             if self._last_image is None:
                 raise ValueError("No screenshot rendered yet; call render() first")
