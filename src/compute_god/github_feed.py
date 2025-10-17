@@ -43,6 +43,13 @@ class RepositoryCard:
 
         return f"{self.owner}/{self.name}" if self.owner else self.name
 
+    @property
+    def url(self) -> str:
+        """Return the canonical web URL for the repository."""
+
+        slug = self.slug
+        return f"https://github.com/{slug}" if slug else "https://github.com"
+
     def summary(self) -> Mapping[str, object]:
         """Return a serialisable snapshot of the repository."""
 
@@ -73,10 +80,21 @@ class IssueActivity:
 
         return f"{self.repository}#{self.number}"
 
+    @property
+    def url(self) -> str:
+        """Return the public URL for the issue on github.com."""
+
+        return f"https://github.com/{self.repository}/issues/{self.number}"
+
     def label_list(self) -> Tuple[str, ...]:
         """Expose the labels as a tuple to discourage accidental mutation."""
 
         return tuple(self.labels)
+
+    def has_label(self, label: str) -> bool:
+        """Return ``True`` when ``label`` is present on the issue."""
+
+        return label in self.labels
 
     def summary(self) -> Mapping[str, object]:
         """Return a serialisable representation of the issue card."""
@@ -107,6 +125,11 @@ class GitHubMobileFeed:
         """Return the canonical references for issue cards in display order."""
 
         return tuple(issue.reference for issue in self.issues)
+
+    def issues_for_repository(self, repository: str) -> Tuple[IssueActivity, ...]:
+        """Return all issues in the feed belonging to ``repository``."""
+
+        return tuple(issue for issue in self.issues if issue.repository == repository)
 
     def summary(self) -> Mapping[str, object]:
         """Return a serialisable view of the feed suitable for templating."""

@@ -21,6 +21,7 @@ def test_github_feed_matches_expected_snapshot() -> None:
     repo = repositories[0]
     assert repo.slug == "JS-KK/google"
     assert repo.summary()["stars"] == 30
+    assert repo.url == "https://github.com/JS-KK/google"
 
     issues = feed.issues
     assert issues == (
@@ -47,9 +48,15 @@ def test_github_feed_matches_expected_snapshot() -> None:
         "equinor/acidwatch#515",
         "oven-sh/bun#23062",
     )
+    assert feed.issues_for_repository("oven-sh/bun") == (issues[1],)
 
     summary = feed.summary()
     assert summary["address"] == feed.address
     assert summary["repositories"][0]["license"] == "Apache-2.0"
     assert summary["issues"][1]["labels"] == ["enhancement", "hacktoberfest"]
+
+    enhancement_issue = issues[1]
+    assert enhancement_issue.url == "https://github.com/oven-sh/bun/issues/23062"
+    assert enhancement_issue.has_label("enhancement") is True
+    assert enhancement_issue.has_label("documentation") is False
 
