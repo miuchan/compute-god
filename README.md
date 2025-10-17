@@ -45,13 +45,13 @@ pnpm add compute-god
 npm i compute-god
 ```
 
-**Python**
+**Python (via [uv](https://github.com/astral-sh/uv))**
 
 ```bash
-pip install compute-god
+uv pip install compute-god
 ```
 
-> 两种实现保持概念等价；API 命名尽量对齐。
+> 两种实现保持概念等价；API 命名尽量对齐。`uv` 提供极速的 Python 依赖管理体验，同时保持对 PyPI 的兼容。
 
 ---
 
@@ -339,9 +339,20 @@ Compute-God/
 
 欢迎以 PR/Issue 的形式贡献规则、度量、可视化与新“神”。
 
+> 详细的 `uv` 开发流程请参阅 [docs/uv-workflow.md](docs/uv-workflow.md)。
+
 1. Fork 本仓库并创建分支：`feat/<your-feature>`
-2. `pnpm i && pnpm -w build && pnpm -w test`
-3. 提交前运行 `pnpm -w lint:fix`
+2. 安装 [uv](https://docs.astral.sh/uv/) 并在项目根目录运行 `uv sync --dev`（根据 `uv.lock` 安装依赖）
+3. 使用 `uv run <script>` 执行项目脚本，例如：
+
+   ```bash
+   uv run test         # pytest
+   uv run lint         # Ruff 检查
+   uv run format       # Ruff 格式化
+   uv run typecheck    # mypy
+   ```
+
+4. 提交前确保 `uv run format` 与 `uv run lint` 通过
 
 > 我们遵循 [Conventional Commits](https://www.conventionalcommits.org/) 与 MIT 许可证。
 

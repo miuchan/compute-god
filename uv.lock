@@ -1,0 +1,14 @@
+# This lock file captures the dev tooling stack expected by uv.
+# It can be regenerated via `uv lock` once uv is installed.
+version = 1
+requires-python = ">=3.9"
+
+[groups]
+default = []
+
+dev = [
+  "pytest==8.4.1",
+  "pytest-cov==5.0.0",
+  "ruff==0.5.7",
+  "mypy==1.10.0",
+]
