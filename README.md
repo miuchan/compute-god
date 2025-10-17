@@ -29,6 +29,7 @@
 * 🧪 **可验证的规则**：规则即数据，纯文本/JSON/DSL 可审计。
 * 🧩 **可嵌入**：可作为库嵌入 Next.js/服务端任务/Notebook，也可以 CLI 运行。
 * 🔬 **可观测性**：事件流 + 日志 + 追踪（step/epoch/fixpoint）一体化。
+* 🛎️ **导诊台**：通过 `guidance_desk()` 按主题浏览所有宇宙、对偶与玩法。
 
 > 如果你在研究「OVERDOSE 之神」「做题家之神」「全知全能神的最简实现」「木林森自同构」等元概念，Compute‑God 提供一套通用骨架。
 
@@ -142,6 +143,24 @@ flowchart LR
   F --> G[(Logs/Trace)]
   H[Oracle] --> B
 ```
+
+## Guidance Desk (导诊台)
+
+> 大型宇宙医院需要前台导诊台。`compute_god.guidance_desk()` 提供一套主题
+> 化的目录，把核心内核、热对偶家族、叙事宇宙与应用案例拆分到不同“站
+> 点”。这让 IDE / CLI / 文档可以更容易地浏览 Compute‑God 的海量导出。
+
+```python
+>>> from compute_god import guidance_desk
+>>> desk = guidance_desk()
+>>> sorted(desk.catalog().keys())[:3]
+['adhd', 'anti_quantum', 'august']
+>>> desk.resolve("core.God")
+<class 'compute_god.core.universe.God'>
+```
+
+`GuidanceDesk` 与 `DeskStation` 也向外导出，方便自定义扩展或在自家项目里
+拼装第二层导诊台。
 
 **核心包结构**
 
