@@ -16,6 +16,9 @@ dependencies = [
   "pillow>=10.0",
 ]
 
+[project.scripts]
+compute-god = "compute_god.cli:main"
+
 [project.optional-dependencies]
 dev = [
   "pytest>=8.2",

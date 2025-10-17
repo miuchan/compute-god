@@ -111,6 +111,31 @@ uv pip install compute-god
 
 > 两种运行器概念等价；`uv` 提供极速的 Python 依赖管理体验，同时保持对 PyPI 的兼容。
 
+### 交互式导览台
+
+安装后可使用 `compute-god` 命令行工具快速浏览宇宙分区：
+
+```bash
+$ compute-god stations
+core
+  - God
+  - Universe
+  - FixpointEngine
+
+$ compute-god station core --format json
+{
+  "description": "内核宇宙的构造器与执行器。",
+  "entries": [
+    "God",
+    "Universe",
+    "rule",
+    "fixpoint"
+  ]
+}
+```
+
+> CLI 输出与 `guidance_desk()` 同步，可用于文档生成、脚本拼装或纯粹的灵感探索。
+
 ### 核心概念速览
 
 * **Universe（宇宙）**：把状态、规则、观察者捆绑成可执行的剧场。
