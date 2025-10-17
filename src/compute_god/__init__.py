@@ -31,6 +31,14 @@ from .miuchan import (
     miuchan_universe,
     run_miuchan_universe,
 )
+from .dongyun import (
+    DongyunBlueprint,
+    dongyun_map,
+    dongyun_metric,
+    dongyun_universe,
+    run_dongyun_institute,
+    东云研究所,
+)
 from .momo import (
     MOMO_KEYS,
     MomoResonanceBlueprint,
