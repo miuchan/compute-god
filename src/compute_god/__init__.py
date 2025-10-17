@@ -273,6 +273,17 @@ from .shuangxiang import (
     双相梯度下降,
     继续梯度下降,
 )
+from .touhou_project import (
+    DEFAULT_BLUEPRINT as TOUHOU_DEFAULT_BLUEPRINT,
+    ReimuNextSolution,
+    TouhouIncidentBlueprint,
+    TouhouIncidentState,
+    reimu_next_solution,
+    run_touhou_incident,
+    touhou_incident_metric,
+    touhou_incident_universe,
+    博丽灵梦下一解,
+)
 
 
 _SYMBOLS = dict(locals())
@@ -708,6 +719,21 @@ _STATION_LAYOUT = (
             "UtawarerumonoChant",
             "LegendChant",
             "传颂之物",
+        ),
+    ),
+    (
+        "touhou_project",
+        "幻想乡异变与博丽灵梦的解题探索。",
+        (
+            "TouhouIncidentBlueprint",
+            "TouhouIncidentState",
+            "TOUHOU_DEFAULT_BLUEPRINT",
+            "touhou_incident_universe",
+            "touhou_incident_metric",
+            "run_touhou_incident",
+            "ReimuNextSolution",
+            "reimu_next_solution",
+            "博丽灵梦下一解",
         ),
     ),
     (
