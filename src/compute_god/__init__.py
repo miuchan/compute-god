@@ -292,6 +292,16 @@ from .touhou_project import (
     touhou_incident_universe,
     博丽灵梦下一解,
 )
+from .s_follow_reading import (
+    DEFAULT_FOLLOW_READING_STATE,
+    FollowReadingBlueprint,
+    FollowReadingFriendProfile,
+    follow_reading_blueprint_from_friends,
+    follow_reading_metric,
+    follow_reading_rules,
+    follow_reading_universe,
+    run_follow_reading_network,
+)
 
 
 _SYMBOLS = dict(locals())
@@ -621,6 +631,20 @@ _STATION_LAYOUT = (
             "llm_cooperation_blueprint_from_agents",
             "llm_cooperation_metric",
             "run_llm_cooperation",
+        ),
+    ),
+    (
+        "s_follow_reading",
+        "S跟读学习朋友合作网络的协作推进规则。",
+        (
+            "FollowReadingFriendProfile",
+            "FollowReadingBlueprint",
+            "DEFAULT_FOLLOW_READING_STATE",
+            "follow_reading_blueprint_from_friends",
+            "follow_reading_rules",
+            "follow_reading_metric",
+            "follow_reading_universe",
+            "run_follow_reading_network",
         ),
     ),
     (
