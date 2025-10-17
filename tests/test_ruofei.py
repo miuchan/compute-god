@@ -52,3 +52,22 @@ def test_ruofei_consults_alternative_when_predicate_fails() -> None:
     assert snapshots[0]["value"] == 2
     assert snapshots[1]["value"] == -1
 
+
+def test_ruofei_branch_prediction_tracks_history() -> None:
+    ruofei = Ruofei(predicate=_has_flag, alternative=_is_positive)
+
+    # Starts weakly favouring the predicate branch.
+    assert ruofei.predict_branch() == "predicate"
+
+    warm_state = {"flag": True, "value": -3}
+    ruofei(warm_state)
+    assert ruofei.last_branch() == "predicate"
+    assert ruofei.predict_branch() == "predicate"
+
+    # Enough alternative invocations swing the prediction.
+    cold_state = {"flag": False, "value": 4}
+    ruofei(cold_state)
+    ruofei(cold_state)
+    assert ruofei.last_branch() == "alternative"
+    assert ruofei.predict_branch() == "alternative"
+

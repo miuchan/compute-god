@@ -142,6 +142,7 @@ class Ruofei:
     history: List[Tuple[State, bool, Optional[bool], bool, str]] = field(
         default_factory=list, init=False
     )
+    _branch_counter: int = field(default=2, init=False, repr=False)
 
     def evaluate(self, state: State, /) -> bool:
         """Evaluate the predicate and optional alternative for ``state``.
@@ -168,6 +169,7 @@ class Ruofei:
         self.history.append(
             (snapshot, predicate_value, alternative_value, result, branch)
         )
+        self._update_branch_counter(branch)
         return result
 
     __call__ = evaluate
@@ -201,6 +203,26 @@ class Ruofei:
             for snapshot, _pred, alt, _result, branch in self.history
             if branch == "alternative" and alt is not None
         ]
+
+    def predict_branch(self) -> str:
+        """Predict which branch is likely to execute next.
+
+        ``Ruofei`` keeps a tiny two-bit saturating counter that mirrors classic
+        CPU branch predictors.  It is incremented when the predicate branch
+        fires and decremented when the alternative branch runs.  Values above
+        or equal to ``2`` predict the predicate branch; lower values predict the
+        alternative.  The counter starts in a "weakly predicate" state so the
+        helper is optimistic about the primary predicate until history proves
+        otherwise.
+        """
+
+        return "predicate" if self._branch_counter >= 2 else "alternative"
+
+    def _update_branch_counter(self, branch: str) -> None:
+        if branch == "predicate":
+            self._branch_counter = min(self._branch_counter + 1, 3)
+        else:
+            self._branch_counter = max(self._branch_counter - 1, 0)
 
 
 # Chinese aliases embracing the playful API surface.
