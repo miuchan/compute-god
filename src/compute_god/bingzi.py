@@ -222,6 +222,112 @@ class Liangzi:
         self._brightest_state = None
 
 
+@dataclass
+class Weimingzi:
+    """Observer watching states that have *not yet* reached the dawn."""
+
+    metric: BrightnessMetric
+    dawn_point: float = 0.0
+    history: List[Tuple[ObserverEvent, float]] = field(default_factory=list, init=False)
+    closest_brightness: Optional[float] = field(default=None, init=False)
+    _closest_state: Optional[State] = field(default=None, init=False, repr=False)
+    _closest_delta: Optional[float] = field(default=None, init=False, repr=False)
+    has_crossed_dawn: bool = field(default=False, init=False)
+
+    def __call__(self, event: ObserverEvent, state: State, /, **metadata: object) -> None:
+        """Track how near the observed brightness is to the ``dawn_point``."""
+
+        brightness = float(self.metric(state))
+        self.history.append((event, brightness))
+
+        if brightness <= self.dawn_point:
+            self.has_crossed_dawn = True
+            return
+
+        delta = brightness - self.dawn_point
+        if self._closest_delta is None or delta < self._closest_delta:
+            self._closest_delta = delta
+            self.closest_brightness = brightness
+            self._closest_state = dict(state)
+
+    @property
+    def distance_to_dawn(self) -> Optional[float]:
+        """Return the smallest positive gap to the ``dawn_point`` seen so far."""
+
+        if self._closest_delta is None:
+            return None
+        return float(self._closest_delta)
+
+    def almost_dawn_state(self) -> Optional[State]:
+        """Return the state that stayed closest to the dawn without crossing it."""
+
+        if self._closest_state is None:
+            return None
+        return dict(self._closest_state)
+
+    def reset(self) -> None:
+        """Clear recorded information so the observer can be reused."""
+
+        self.history.clear()
+        self.closest_brightness = None
+        self._closest_state = None
+        self._closest_delta = None
+        self.has_crossed_dawn = False
+
+
+@dataclass
+class Weiliangzi:
+    """Observer watching states that have *not yet* reached the shine."""
+
+    metric: BrightnessMetric
+    shine_point: float = 100.0
+    history: List[Tuple[ObserverEvent, float]] = field(default_factory=list, init=False)
+    closest_brightness: Optional[float] = field(default=None, init=False)
+    _closest_state: Optional[State] = field(default=None, init=False, repr=False)
+    _closest_delta: Optional[float] = field(default=None, init=False, repr=False)
+    has_crossed_shine: bool = field(default=False, init=False)
+
+    def __call__(self, event: ObserverEvent, state: State, /, **metadata: object) -> None:
+        """Track how near the observed brightness is to the ``shine_point``."""
+
+        brightness = float(self.metric(state))
+        self.history.append((event, brightness))
+
+        if brightness >= self.shine_point:
+            self.has_crossed_shine = True
+            return
+
+        delta = self.shine_point - brightness
+        if self._closest_delta is None or delta < self._closest_delta:
+            self._closest_delta = delta
+            self.closest_brightness = brightness
+            self._closest_state = dict(state)
+
+    @property
+    def distance_to_shine(self) -> Optional[float]:
+        """Return the smallest positive gap to the ``shine_point`` seen so far."""
+
+        if self._closest_delta is None:
+            return None
+        return float(self._closest_delta)
+
+    def almost_shine_state(self) -> Optional[State]:
+        """Return the state that stayed closest to the shine without crossing it."""
+
+        if self._closest_state is None:
+            return None
+        return dict(self._closest_state)
+
+    def reset(self) -> None:
+        """Clear recorded information so the observer can be reused."""
+
+        self.history.clear()
+        self.closest_brightness = None
+        self._closest_state = None
+        self._closest_delta = None
+        self.has_crossed_shine = False
+
+
 def peculiar_asymmetry(bingzi: Bingzi, pingzi: Pingzi) -> Optional[float]:
     """Return the temperature gap between ``Bingzi`` and ``Pingzi``.
 
@@ -320,6 +426,8 @@ def qianli_bingfeng(
 平子 = PingziRelation
 明子 = Mingzi
 亮子 = Liangzi
+未明子 = Weimingzi
+未亮子 = Weiliangzi
 千里冰封 = qianli_bingfeng
 
 
@@ -335,6 +443,10 @@ __all__ = [
     "平子",
     "明子",
     "亮子",
+    "Weimingzi",
+    "Weiliangzi",
+    "未明子",
+    "未亮子",
     "qianli_bingfeng",
     "千里冰封",
 ]

@@ -1,4 +1,14 @@
-from compute_god import Liangzi, Mingzi, ObserverEvent, 亮子, 明子
+from compute_god import (
+    Liangzi,
+    Mingzi,
+    ObserverEvent,
+    Weiliangzi,
+    Weimingzi,
+    亮子,
+    明子,
+    未亮子,
+    未明子,
+)
 
 
 def brightness_metric(state):
@@ -78,3 +88,66 @@ def test_mingzi_liangzi_have_chinese_aliases() -> None:
 
     assert isinstance(ming, Mingzi)
     assert isinstance(liang, Liangzi)
+
+
+def test_weimingzi_tracks_pre_dawn_states() -> None:
+    observer = Weimingzi(metric=brightness_metric, dawn_point=-5.0)
+
+    observer(ObserverEvent.STEP, _make_state(3.0))
+    observer(ObserverEvent.EPOCH, _make_state(-10.0))
+    observer(ObserverEvent.STEP, _make_state(-1.0))
+
+    assert observer.closest_brightness == -1.0
+    assert observer.distance_to_dawn == 4.0
+    snapshot = observer.almost_dawn_state()
+    assert snapshot == {"brightness": -1.0}
+
+    snapshot["brightness"] = 999.0
+    assert observer.almost_dawn_state() == {"brightness": -1.0}
+
+    assert observer.has_crossed_dawn is True
+
+    observer.reset()
+
+    assert observer.history == []
+    assert observer.closest_brightness is None
+    assert observer.distance_to_dawn is None
+    assert observer.almost_dawn_state() is None
+    assert observer.has_crossed_dawn is False
+
+
+def test_weiliangzi_tracks_pre_shine_states() -> None:
+    observer = Weiliangzi(metric=brightness_metric, shine_point=80.0)
+
+    observer(ObserverEvent.STEP, _make_state(30.0))
+    observer(ObserverEvent.EPOCH, _make_state(120.0))
+    observer(ObserverEvent.STEP, _make_state(70.0))
+
+    assert observer.closest_brightness == 70.0
+    assert observer.distance_to_shine == 10.0
+    snapshot = observer.almost_shine_state()
+    assert snapshot == {"brightness": 70.0}
+
+    snapshot["brightness"] = 0.0
+    assert observer.almost_shine_state() == {"brightness": 70.0}
+
+    assert observer.has_crossed_shine is True
+
+    observer.reset()
+
+    assert observer.history == []
+    assert observer.closest_brightness is None
+    assert observer.distance_to_shine is None
+    assert observer.almost_shine_state() is None
+    assert observer.has_crossed_shine is False
+
+
+def test_weimingzi_weiliangzi_have_chinese_aliases() -> None:
+    assert 未明子 is Weimingzi
+    assert 未亮子 is Weiliangzi
+
+    ming = 未明子(metric=brightness_metric)
+    liang = 未亮子(metric=brightness_metric)
+
+    assert isinstance(ming, Weimingzi)
+    assert isinstance(liang, Weiliangzi)
