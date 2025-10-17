@@ -48,6 +48,7 @@ from .momo import (
 )
 from .screenshot import ScreenshotEnvironment, ScreenshotTheme
 from .github_feed import GitHubMobileFeed, IssueActivity, RepositoryCard, github_feed
+from .github_offline import OfflineGitHub, IssueNotFound, RepositoryNotFound, access_github
 
 
 def _register_compat_module(name: str, **attrs: object) -> ModuleType:
@@ -858,4 +859,15 @@ for _, _, symbols in _STATION_LAYOUT:
             __all__.append(symbol)
 __all__.extend(["DeskStation", "GuidanceDesk", "GUIDANCE_DESK", "guidance_desk"])
 __all__.extend(["ScreenshotEnvironment", "ScreenshotTheme"])
-__all__.extend(["GitHubMobileFeed", "IssueActivity", "RepositoryCard", "github_feed"])
+__all__.extend([
+    "GitHubMobileFeed",
+    "IssueActivity",
+    "RepositoryCard",
+    "github_feed",
+])
+__all__.extend([
+    "OfflineGitHub",
+    "IssueNotFound",
+    "RepositoryNotFound",
+    "access_github",
+])
