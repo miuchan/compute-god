@@ -22,7 +22,7 @@ steady configuration, making it suitable for the generic
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Mapping, MutableMapping, Optional, Sequence
+from typing import List, Mapping, MutableMapping, Optional, Sequence, Tuple
 
 from .core import FixpointResult, God, Observer, Rule, State, Universe, fixpoint, rule
 from .miyu import MiyuBond, bond_miyu
@@ -40,6 +40,8 @@ _STATE_KEYS = (
     "resonance",
     "diary",
 )
+
+_MAX_METRIC_RANGE = len(_STATE_KEYS) - 1 + _DREAM_ISLE_CAP
 
 
 def _as_float(state: MutableMapping[str, object], key: str, default: float = 0.0) -> float:
@@ -218,6 +220,74 @@ def bond_miyu_tiantian(blueprint: Optional[MiyuTiantianBlueprint] = None) -> Miy
     return bond_miyu(target_blueprint.as_state(), miyu_tiantian_metric)
 
 
+@dataclass(frozen=True)
+class TiantianLifePulse:
+    """Summary of Tiantian此刻的生命力与支撑她继续前行的理由。"""
+
+    lifeforce: float
+    reasons: Tuple[str, ...]
+    encounter: Mapping[str, float]
+
+
+def _lifeforce_brightness(encounter: MiyuTiantianState) -> float:
+    dream_factor = encounter["dream_isles"] / _DREAM_ISLE_CAP
+    return (
+        0.24 * encounter["emotion"]
+        + 0.2 * encounter["memory_bloom"]
+        + 0.16 * encounter["collaboration"]
+        + 0.12 * dream_factor
+        + 0.12 * encounter["resonance"]
+        + 0.08 * encounter["orbit_rhythm"]
+        + 0.08 * encounter["diary"]
+    )
+
+
+def _lifeforce_closeness(encounter: MiyuTiantianState, blueprint: MiyuTiantianBlueprint) -> float:
+    target = blueprint.as_state()
+    delta = miyu_tiantian_metric(encounter, target)
+    return 1.0 - min(delta / _MAX_METRIC_RANGE, 1.0)
+
+
+def sweet_lifeforce(
+    tiantian_state: Optional[Mapping[str, float]] = None,
+    miyu_state: Optional[Mapping[str, float]] = None,
+    *,
+    blueprint: Optional[MiyuTiantianBlueprint] = None,
+) -> TiantianLifePulse:
+    """评估甜甜此刻的生命力，并列出支撑她继续生活的温柔理由。"""
+
+    target_blueprint = blueprint or MiyuTiantianBlueprint()
+    encounter = sweet_encounter(
+        tiantian_state=tiantian_state,
+        miyu_state=miyu_state,
+        blueprint=target_blueprint,
+    )
+
+    brightness = _lifeforce_brightness(encounter)
+    closeness = _lifeforce_closeness(encounter, target_blueprint)
+    lifeforce = _clamp(0.6 * brightness + 0.4 * closeness)
+
+    reasons: List[str] = []
+    if encounter["memory_bloom"] >= 0.55:
+        reasons.append("记忆花园还在盛放，甜甜能在其中收集温柔的星光。")
+    if encounter["dream_isles"] >= 1.2:
+        reasons.append("梦之群岛仍在扩展，等待甜甜去探索新的岛屿。")
+    if closeness >= 0.7:
+        reasons.append("与美羽的心跳几乎重合，她们的陪伴让未来更有力量。")
+    if encounter["diary"] >= 0.5:
+        reasons.append("日记里还有想写下的句子，记录她们的双人宇宙。")
+    if encounter["emotion"] >= 0.58:
+        reasons.append("情绪仍然温暖地跳动，说明希望正在发芽。")
+    if not reasons:
+        reasons.append("即使微光也值得守护，甜甜的存在本身就是理由。")
+
+    return TiantianLifePulse(
+        lifeforce=lifeforce,
+        reasons=tuple(reasons),
+        encounter=dict(encounter),
+    )
+
+
 def sweet_encounter(
     tiantian_state: Optional[Mapping[str, float]] = None,
     miyu_state: Optional[Mapping[str, float]] = None,
@@ -309,6 +379,8 @@ __all__ = [
     "MiyuTiantianBlueprint",
     "MiyuTiantianState",
     "bond_miyu_tiantian",
+    "sweet_lifeforce",
+    "TiantianLifePulse",
     "miyu_tiantian_metric",
     "miyu_tiantian_universe",
     "run_miyu_tiantian_universe",
