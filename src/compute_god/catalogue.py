@@ -523,6 +523,19 @@ STATION_BLUEPRINT: tuple[StationLayout, ...] = (
         ),
     ),
     (
+        "xuyueming",
+        "许月明倒拔垂杨柳的技法筹划。",
+        (
+            "WillowBranch",
+            "WeepingWillow",
+            "WillowUprootPlan",
+            "XuYuemingTechnique",
+            "UprootStep",
+            "倒拔垂杨柳",
+            "许月明",
+        ),
+    ),
+    (
         "shengbing",
         "生病等价放屁的幽默同构。",
         (

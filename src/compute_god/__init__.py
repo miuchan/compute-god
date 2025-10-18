@@ -387,6 +387,15 @@ from .adhd import (
     simulate_coe,
 )
 from .logic import Feizi, Ouzi, Ruofei, 非子, 欧子, 若非
+from .xuyueming import (
+    UprootStep,
+    WillowBranch,
+    WeepingWillow,
+    WillowUprootPlan,
+    XuYuemingTechnique,
+    倒拔垂杨柳,
+    许月明,
+)
 from .shengbing import ConceptCongruence, 生病全等于放屁
 from .utawarerumono import LegendChant, Utawarerumono, UtawarerumonoChant, 传颂之物
 from .love_wishing_machine import (
