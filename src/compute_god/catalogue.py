@@ -359,6 +359,17 @@ STATION_BLUEPRINT: tuple[StationLayout, ...] = (
         ),
     ),
     (
+        "cooperation_evolution",
+        "合作演化动力学的策略演进。",
+        (
+            "CooperationParameters",
+            "CooperationState",
+            "DEFAULT_COOPERATION_STATE",
+            "evolve_cooperation",
+            "run_cooperation_evolution",
+        ),
+    ),
+    (
         "llm_cooperation",
         "多智能体协作蓝图与指标。",
         (
