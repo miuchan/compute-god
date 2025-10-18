@@ -285,6 +285,18 @@ STATION_BLUEPRINT: tuple[StationLayout, ...] = (
         ),
     ),
     (
+        "life_tools",
+        "日常自我照护工具箱的仪式化安排。",
+        (
+            "LifeNeed",
+            "ToolRitual",
+            "design_hydration_ritual",
+            "design_meal_landscape",
+            "design_energy_breaks",
+            "assemble_life_toolkit",
+        ),
+    ),
+    (
         "rule_optimisation",
         "规则权重的梯度化调节。",
         (
