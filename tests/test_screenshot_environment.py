@@ -12,10 +12,11 @@ from compute_god.screenshot import ScreenshotEnvironment
 def test_component_bounds_requires_render() -> None:
     env = ScreenshotEnvironment()
     with pytest.raises(RuntimeError):
-        env.component_bounds("search_bar")
+        env.component_bounds("hero:panel")
 
     image = env.render()
-    assert env.component_bounds("search_bar")[0] == env.horizontal_margin
+    hero_panel = env.component_bounds("hero:panel")
+    assert hero_panel[0] == env.horizontal_margin + 6
     assert env.verify(image)
 
 
@@ -24,19 +25,23 @@ def test_render_save_and_verify(tmp_path: Path) -> None:
     image = env.render()
 
     palette = env.palette
-    search_bounds = env.component_bounds("search_bar")
-    search_sample = (search_bounds[0] + 120, search_bounds[1] + 50)
-    assert image.getpixel(search_sample) == palette["search_surface"]
+    accent_bounds = env.component_bounds("hero:accent")
+    accent_sample = (accent_bounds[0] + 40, accent_bounds[1] + 40)
+    assert image.getpixel(accent_sample) == palette["accent_primary"]
 
-    first_card = env.component_bounds("card:0:accent")
-    first_sample = (first_card[0] + 40, first_card[1] + 40)
-    assert image.getpixel(first_sample) == palette["accent_0"]
+    cta_bounds = env.component_bounds("hero:cta")
+    cta_sample = (cta_bounds[0] + 20, cta_bounds[1] + 20)
+    assert image.getpixel(cta_sample) == palette["accent_secondary"]
 
-    second_card = env.component_bounds("card:1:accent")
-    second_sample = (second_card[0] + 40, second_card[1] + 40)
-    assert image.getpixel(second_sample) == palette["accent_1"]
+    feature_panel = env.component_bounds("feature:0")
+    feature_sample = (feature_panel[0] + 100, feature_panel[1] + 60)
+    assert image.getpixel(feature_sample) == palette["panel_surface"]
 
-    saved = env.save(tmp_path / "search.png", image=image)
+    tertiary_accent = env.component_bounds("feature:2:accent")
+    tertiary_sample = (tertiary_accent[0] + 6, tertiary_accent[1] + 40)
+    assert image.getpixel(tertiary_sample) == palette["accent_tertiary"]
+
+    saved = env.save(tmp_path / "landing.png", image=image)
     assert saved.exists()
 
     assert env.verify(image)
