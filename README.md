@@ -18,6 +18,7 @@ The Compute-God project treats "Earth Online" as a living laboratory.  Every mod
 - [Getting Started](#getting-started)
 - [Universe Catalogue & CLI](#universe-catalogue--cli)
 - [Development Workflow](#development-workflow)
+- [Publishing to PyPI](#publishing-to-pypi)
 - [Roadmap](#roadmap)
 
 ## Project Overview
@@ -153,6 +154,11 @@ The CLI output is deterministic, making it perfect for generating documentation 
 4. **Keep docs in sync** – update `README.md` and [`docs/TODO.md`](docs/TODO.md) whenever you add or reclassify a universe.
 
 CI scripts in sister repositories consume the shared catalogue blueprint, so every change to `catalogue.py` propagates automatically to documentation and TypeScript typings.
+
+## Publishing to PyPI
+Releases of the Python runtime are published to [PyPI](https://pypi.org/project/compute-god/).  A step-by-step guide covering
+version bumps, pre-flight checks, TestPyPI verification, and the trusted publishing workflow that powers
+GitHub Releases lives in [`docs/publish_to_pypi.md`](docs/publish_to_pypi.md).
 
 ## Roadmap
 The living checklist in [`docs/TODO.md`](docs/TODO.md) translates this README into actionable work – from codifying new universes to improving cross-repo automation.  Tick items as they ship, and propose new experiments via pull requests to keep the Earth Online Experience Lab evolving.
