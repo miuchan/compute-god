@@ -125,6 +125,16 @@ from .live_and_let_live import (
     run_live_and_let_live,
     让自己活也让别人活,
 )
+from .yin_yang_wu_xing import (
+    Element,
+    Polarity,
+    Trigram,
+    arrange_bagua,
+    generation_cycle,
+    overcoming_cycle,
+    trigram,
+    trigram_from_lines,
+)
 
 
 def _find_pyproject_file() -> Path | None:
