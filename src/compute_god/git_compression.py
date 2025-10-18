@@ -60,6 +60,9 @@ class CompressionAlgorithm:
         """
 
         churn_penalty = 0.3 + 0.7 * profile.update_frequency
+        # High churn blobs benefit disproportionately from low CPU codecs; apply an
+        # extra quadratic term so frequently edited files prefer faster options.
+        churn_penalty += profile.update_frequency ** 2
         penalty = self.cpu_cost * churn_penalty
         bonus = 0.0
         if self.dictionary_support and profile.dictionary_candidate:
