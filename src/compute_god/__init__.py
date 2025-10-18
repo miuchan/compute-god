@@ -62,6 +62,14 @@ from .momo import (
 from .screenshot import ScreenshotEnvironment, ScreenshotTheme
 from .github_feed import GitHubMobileFeed, IssueActivity, RepositoryCard, github_feed
 from .github_offline import OfflineGitHub, IssueNotFound, RepositoryNotFound, access_github
+from .git_compression import (
+    CompressionAlgorithm,
+    CompressionPlan,
+    GitObjectProfile,
+    git_friendly_algorithms,
+    known_compression_algorithms,
+    plan_repository_compression,
+)
 from .landscape_learning import (
     LandscapeLearningParameters,
     LandscapeSample,
@@ -393,6 +401,14 @@ __all__.extend([
     "IssueNotFound",
     "RepositoryNotFound",
     "access_github",
+])
+__all__.extend([
+    "CompressionAlgorithm",
+    "CompressionPlan",
+    "GitObjectProfile",
+    "git_friendly_algorithms",
+    "known_compression_algorithms",
+    "plan_repository_compression",
 ])
 
 del _GUIDANCE_SYMBOLS
