@@ -85,6 +85,13 @@ STATION_BLUEPRINT: tuple[StationLayout, ...] = (
             "千里冰封",
             "瓶子",
             "平子",
+            "Yuzi",
+            "Qizi",
+            "YuziParameters",
+            "QiziParameters",
+            "GridSummary",
+            "玉子",
+            "琦子",
         ),
     ),
     (
