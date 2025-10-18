@@ -1,6 +1,6 @@
 import functools
 
-from compute_god import God, fixpoint, rule
+from compute_god import God, fixpoint, recursive_descent_fixpoint, rule
 
 
 def edit_distance(a, b):
@@ -123,3 +123,27 @@ def test_rule_accepts_partial():
 
     assert result.converged is True
     assert result.universe.state["value"] == 3
+
+
+def test_recursive_descent_fixpoint_matches_iterative():
+    target = 5
+
+    def increment(state):
+        value = state.get("counter", 0)
+        return {**state, "counter": min(value + 1, target)}
+
+    def universe_factory():
+        return God.universe(state={"counter": 0}, rules=[rule("increment", increment)])
+
+    kwargs = dict(
+        metric=lambda a, b: abs(a.get("counter", 0) - b.get("counter", 0)),
+        epsilon=0,
+        max_epoch=10,
+    )
+
+    recursive_result = recursive_descent_fixpoint(universe_factory(), **kwargs)
+    iterative_result = fixpoint(universe_factory(), **kwargs)
+
+    assert recursive_result.converged is iterative_result.converged is True
+    assert recursive_result.universe.state == iterative_result.universe.state == {"counter": target}
+    assert recursive_result.epochs == iterative_result.epochs

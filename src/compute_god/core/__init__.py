@@ -1,6 +1,6 @@
 """Compute-God core runtime package."""
 
-from .engine import FixpointEngine, FixpointResult, Metric, fixpoint
+from .engine import FixpointEngine, FixpointResult, Metric, fixpoint, recursive_descent_fixpoint
 from .observer import Observer, ObserverEvent, NoopObserver, combine_observers
 from .rules import ApplyFn, PredicateFn, Rule, rule
 from .types import RuleContext, State
@@ -22,5 +22,6 @@ __all__ = [
     "Universe",
     "combine_observers",
     "fixpoint",
+    "recursive_descent_fixpoint",
     "rule",
 ]
