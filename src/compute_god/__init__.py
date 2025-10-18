@@ -99,6 +99,17 @@ from .gift import (
     prepare_gift_canvas,
     sculpt_gift_landscape,
 )
+try:  # pragma: no cover - optional dependency during import
+    from .self_application_er_epr import (
+        bell_state,
+        choi_state_from_kraus,
+        entanglement_entropy,
+        factorial_via_y,
+        thermofield_double,
+        y_combinator,
+    )
+except ImportError:  # pragma: no cover - numpy may be unavailable in minimal installs
+    pass
 from .pottery_gallery import (
     PedestalRow,
     PotteryDisplay,
