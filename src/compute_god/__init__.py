@@ -87,6 +87,13 @@ from .gift import (
     prepare_gift_canvas,
     sculpt_gift_landscape,
 )
+from .pottery_gallery import (
+    PedestalRow,
+    PotteryDisplay,
+    PotteryVessel,
+    describe_display,
+    generate_pottery_display,
+)
 from .live_and_let_live import (
     LiveAndLetLiveParameters,
     LiveAndLetLiveState,
