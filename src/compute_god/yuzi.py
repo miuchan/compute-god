@@ -15,6 +15,7 @@ helpers are combined with analytical tooling.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import Callable, Iterable, MutableMapping, Tuple
 
@@ -102,6 +103,16 @@ class GridSummary:
     max_coordinate: Coordinate
 
 
+@dataclass(frozen=True)
+class QuantumThermalDual:
+    """Summary describing the quantum-thermal relationship of 玉子 and 琦子 grids."""
+
+    base_energy: float
+    modulated_energy: float
+    quantum_amplification: float
+    thermal_balance: float
+
+
 @dataclass
 class Qizi:
     """Modulate a :class:`Yuzi` grid and report its statistics."""
@@ -141,9 +152,43 @@ class Qizi:
         )
 
 
+def quantum_thermal_dual(yuzi: Yuzi, qizi: Qizi) -> QuantumThermalDual:
+    """Calculate the quantum thermal dual between a base ``Yuzi`` grid and its ``Qizi`` modulation."""
+
+    base_grid = yuzi.compute_grid()
+    modulated_grid = qizi.compute_grid()
+
+    if base_grid.keys() != modulated_grid.keys():
+        raise ValueError("Yuzi and Qizi grids must span the same coordinates")
+
+    values = list(base_grid.values())
+    modulated_values = list(modulated_grid.values())
+    if not values:
+        raise ValueError("grid is empty; cannot compute duality")
+
+    base_energy = sum(value * value for value in values) / len(values)
+    modulated_energy = sum(value * value for value in modulated_values) / len(modulated_values)
+    if math.isclose(base_energy, 0.0, abs_tol=1e-12):
+        quantum_amplification = math.inf
+    else:
+        quantum_amplification = modulated_energy / base_energy
+
+    base_mean = sum(values) / len(values)
+    modulated_mean = sum(modulated_values) / len(modulated_values)
+    thermal_balance = (base_mean + modulated_mean) / 2.0
+
+    return QuantumThermalDual(
+        base_energy=float(base_energy),
+        modulated_energy=float(modulated_energy),
+        quantum_amplification=float(quantum_amplification),
+        thermal_balance=float(thermal_balance),
+    )
+
+
 # Playful aliases embracing the narrative surface.
 玉子 = Yuzi
 琦子 = Qizi
+量子热对偶 = quantum_thermal_dual
 
 __all__ = [
     "Coordinate",
@@ -154,6 +199,9 @@ __all__ = [
     "QiziParameters",
     "Qizi",
     "GridSummary",
+    "QuantumThermalDual",
+    "quantum_thermal_dual",
     "玉子",
     "琦子",
+    "量子热对偶",
 ]
