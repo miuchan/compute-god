@@ -5,10 +5,11 @@ from __future__ import annotations
 from typing import Iterator, Mapping
 
 from .guidance import DeskStation, GuidanceDesk
+from .information_architecture import restructure_information_architecture
 
 StationLayout = tuple[str, str, tuple[str, ...]]
 
-STATION_BLUEPRINT: tuple[StationLayout, ...] = (
+_RAW_STATION_BLUEPRINT: tuple[StationLayout, ...] = (
     (
         "core",
         "Core runtime primitives for building universes and solving fixed points.",
@@ -599,6 +600,10 @@ STATION_BLUEPRINT: tuple[StationLayout, ...] = (
             "继续梯度下降",
         ),
     ),
+)
+
+STATION_BLUEPRINT: tuple[StationLayout, ...] = restructure_information_architecture(
+    _RAW_STATION_BLUEPRINT
 )
 
 def build_guidance_desk(symbols: Mapping[str, object]) -> GuidanceDesk:

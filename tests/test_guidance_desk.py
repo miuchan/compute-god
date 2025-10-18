@@ -41,7 +41,8 @@ def test_guidance_desk_catalogue_navigation() -> None:
     catalog = GUIDANCE_DESK.catalog()
     assert "core" in catalog
     assert "bonds" in catalog
-    assert catalog["core"][0] == "ApplyFn"
+    assert catalog["core"][:5] == ("God", "Rule", "rule", "State", "Metric")
+    assert "ApplyFn" in catalog["core"]
 
     assert GUIDANCE_DESK.has_entry("metaverse.run_ideal_metaverse")
     assert GUIDANCE_DESK.resolve("metaverse/run_ideal_metaverse") is GUIDANCE_DESK["metaverse"]["run_ideal_metaverse"]
