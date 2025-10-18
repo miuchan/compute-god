@@ -222,6 +222,17 @@ from .siqianzi import (
     死前子网络,
     死前子热对偶网络,
 )
+from .dianfen_changzi import (
+    StarchSausageEquilibrium,
+    StarchSausageNetworkGame,
+    StarchSausagePlayer,
+    build_starch_sausage_game,
+    simulate_starch_sausage_game,
+    淀粉肠子均衡,
+    淀粉肠子网络,
+    淀粉肠子玩家,
+    淀粉肠子网络博弈,
+)
 from .jiahao import (
     JiahaoMaximumThermalDual,
     jiahao_max_thermal_dual,
