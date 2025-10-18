@@ -118,4 +118,55 @@ def fixpoint(
     return engine.run(universe)
 
 
-__all__ = ["FixpointEngine", "FixpointResult", "Metric", "fixpoint"]
+def recursive_descent_fixpoint(
+    universe: Universe,
+    *,
+    metric: Metric,
+    epsilon: float,
+    max_epoch: int,
+    observer: Optional[Observer] = None,
+) -> FixpointResult:
+    """Compute a fixpoint using a recursive descent strategy.
+
+    The recursive variant mirrors :func:`fixpoint` but expresses the epoch loop as
+    a recursive descent.  This is mostly pedagogical – some experiments in the
+    wider lab prefer the structural recursion style when reasoning about
+    backtracking universes – yet it retains feature parity with the iterative
+    engine so tests and observers behave identically.
+    """
+
+    ctx = God.rule_context()
+    active_observer = observer or combine_observers(*universe.observers)
+    epoch_ctx = _EpochContext(
+        observer=active_observer,
+        metric=metric,
+        epsilon=epsilon,
+        initial_state=universe.state,
+    )
+
+    def descend(current: Universe, epoch: int) -> FixpointResult:
+        if epoch > max_epoch:
+            active_observer(
+                ObserverEvent.FIXPOINT_MAXED,
+                current.state,
+                epoch=max_epoch,
+            )
+            return FixpointResult(universe=current, converged=False, epochs=max_epoch)
+
+        new_state = _apply_rules(current, ctx, active_observer)
+        next_universe = Universe(new_state, current.rules, current.observers)
+        if epoch_ctx.record(new_state, epoch=epoch):
+            return FixpointResult(universe=next_universe, converged=True, epochs=epoch)
+
+        return descend(next_universe, epoch + 1)
+
+    return descend(universe, 1)
+
+
+__all__ = [
+    "FixpointEngine",
+    "FixpointResult",
+    "Metric",
+    "fixpoint",
+    "recursive_descent_fixpoint",
+]

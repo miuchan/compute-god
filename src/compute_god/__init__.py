@@ -22,6 +22,7 @@ from .core import (
     Metric,
     combine_observers,
     fixpoint,
+    recursive_descent_fixpoint,
     rule,
 )
 from .miyu import MiyuBond, bond_miyu
@@ -111,6 +112,7 @@ _register_compat_module(
     FixpointResult=FixpointResult,
     Metric=Metric,
     fixpoint=fixpoint,
+    recursive_descent_fixpoint=recursive_descent_fixpoint,
 )
 _register_compat_module(
     "observer",
