@@ -8,10 +8,13 @@ from compute_god import (
     GridSummary,
     Qizi,
     QiziParameters,
+    QuantumThermalDual,
     Yuzi,
     YuziParameters,
+    quantum_thermal_dual,
     玉子,
     琦子,
+    量子热对偶,
 )
 
 
@@ -86,3 +89,19 @@ def test_aliases_point_to_original_classes() -> None:
 
     assert isinstance(yuzi, Yuzi)
     assert isinstance(qizi, Qizi)
+
+
+def test_quantum_thermal_dual_reports_energy_and_balance() -> None:
+    yuzi_params = YuziParameters(width=2, height=1, base=1.0, x_weight=1.0, y_weight=0.0)
+    yuzi = Yuzi(yuzi_params)
+    qizi = Qizi(QiziParameters(yuzi=yuzi_params, scale=2.0, offset=0.0, exponent=2.0))
+
+    dual = quantum_thermal_dual(yuzi, qizi)
+
+    assert isinstance(dual, QuantumThermalDual)
+    assert dual.base_energy == pytest.approx(2.5)
+    assert dual.modulated_energy == pytest.approx(34.0)
+    assert dual.quantum_amplification == pytest.approx(34.0 / 2.5)
+    assert dual.thermal_balance == pytest.approx(3.25)
+
+    assert 量子热对偶 is quantum_thermal_dual

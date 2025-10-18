@@ -195,10 +195,13 @@ from .yuzi import (
     GridSummary,
     Qizi,
     QiziParameters,
+    QuantumThermalDual,
     Yuzi,
     YuziParameters,
+    quantum_thermal_dual,
     玉子,
     琦子,
+    量子热对偶,
 )
 from .sanzi import Sanzi, SanziOverview, Weizi, 三子, 维子
 from .siqianzi import (

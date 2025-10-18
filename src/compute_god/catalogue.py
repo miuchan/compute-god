@@ -90,8 +90,11 @@ STATION_BLUEPRINT: tuple[StationLayout, ...] = (
             "YuziParameters",
             "QiziParameters",
             "GridSummary",
+            "QuantumThermalDual",
+            "quantum_thermal_dual",
             "玉子",
             "琦子",
+            "量子热对偶",
         ),
     ),
     (
