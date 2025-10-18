@@ -125,6 +125,21 @@ STATION_BLUEPRINT: tuple[StationLayout, ...] = (
         ),
     ),
     (
+        "dianfen_changzi",
+        "淀粉肠子网络博弈与松弛均衡。",
+        (
+            "StarchSausagePlayer",
+            "StarchSausageNetworkGame",
+            "StarchSausageEquilibrium",
+            "build_starch_sausage_game",
+            "simulate_starch_sausage_game",
+            "淀粉肠子玩家",
+            "淀粉肠子网络",
+            "淀粉肠子均衡",
+            "淀粉肠子网络博弈",
+        ),
+    ),
+    (
         "jizi",
         "自机子热对偶与其伙伴体系。",
         (
