@@ -241,6 +241,14 @@ from .life import (
     optimise_game_of_life,
     optimise_game_of_life_multistep,
 )
+from .life_toolbox import (
+    LifeNeed,
+    ToolRitual,
+    assemble_life_toolkit,
+    design_energy_breaks,
+    design_hydration_ritual,
+    design_meal_landscape,
+)
 from .rule_optimisation import RuleOptimisationResult, optimise_rule_weights
 from .degree_space import DegreeDual, DegreeSpace, DegreeTensor, tensor_product
 from .metaverse import (
