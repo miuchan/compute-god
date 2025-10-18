@@ -77,6 +77,15 @@ from .landscape_learning import (
     landscape_learning_universe,
     learn_landscape,
 )
+from .gift import (
+    GiftCoordinate,
+    GiftGrid,
+    GiftPlan,
+    GiftWish,
+    describe_gift_plan,
+    prepare_gift_canvas,
+    sculpt_gift_landscape,
+)
 
 
 def _register_compat_module(name: str, **attrs: object) -> ModuleType:

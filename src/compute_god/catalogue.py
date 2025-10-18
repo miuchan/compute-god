@@ -43,6 +43,16 @@ STATION_BLUEPRINT: tuple[StationLayout, ...] = (
         ),
     ),
     (
+        "gift",
+        "用景观学习雕刻手工礼物灵感。",
+        (
+            "GiftWish",
+            "prepare_gift_canvas",
+            "sculpt_gift_landscape",
+            "describe_gift_plan",
+        ),
+    ),
+    (
         "bonds",
         "Bond-building blueprints connecting Miyu and companions across universes.",
         (

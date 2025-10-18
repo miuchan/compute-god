@@ -66,7 +66,9 @@ class CompressionAlgorithm:
         penalty = self.cpu_cost * churn_penalty
         bonus = 0.0
         if self.dictionary_support and profile.dictionary_candidate:
-            bonus += 0.1
+            # High churn reduces the benefit of dictionary training because
+            # corpora drift quickly; taper the bonus accordingly.
+            bonus += 0.1 * (1.0 - 0.5 * profile.update_frequency)
         if profile.kind == "pack" and self.streaming:
             bonus += 0.05
         if not self.git_support:
