@@ -78,6 +78,12 @@ from .landscape_learning import (
     landscape_learning_universe,
     learn_landscape,
 )
+from .factorio import (
+    FactoryBalance,
+    FactoryBlueprint,
+    FactoryStep,
+    Recipe,
+)
 from .gift import (
     GiftCoordinate,
     GiftGrid,
