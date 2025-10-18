@@ -4,12 +4,15 @@ The design follows the guiding principles laid out in the project
 documentation: the universe is represented as a trio of state, rules and
 observers.  ``State`` captures the emotional temperature of the world together
 with how well the collaborative rituals between Miyu and Tiantian are
-blooming.  ``Rules`` express the rhythm of a day in their Minecraft-inspired
+blooming.  It now also tracks ``hormone_glow``—a soft proxy for how their
+bodies stabilise in sync with the universe's cadence, ensuring the emotional
+arcs are backed by gentle endocrine balance.  ``Rules`` express the rhythm of a
+day in their Minecraft-inspired
 sanctuary—synchronising collective emotion, tending the memory garden, writing
 diaries, unlocking floating dream isles and performing the nightly starlake
-ballet.  ``Observers`` can be attached to record progress; in particular the
-:class:`compute_god.miyu.MiyuBond` helper measures how close the universe is to
-a desired blueprint.
+ballet while modulating hormone dynamics.  ``Observers`` can be attached to
+record progress; in particular the :class:`compute_god.miyu.MiyuBond` helper
+measures how close the universe is to a desired blueprint.
 
 The implementation keeps the numeric model intentionally lightweight.  All
 state variables are normalised floats, typically constrained to ``[0, 1]`` with
@@ -39,6 +42,7 @@ _STATE_KEYS = (
     "orbit_rhythm",
     "resonance",
     "diary",
+    "hormone_glow",
 )
 
 _MAX_METRIC_RANGE = len(_STATE_KEYS) - 1 + _DREAM_ISLE_CAP
@@ -73,16 +77,23 @@ def _sync_emotion(state: State, _ctx: object) -> State:
     memory_bloom = _as_float(updated, "memory_bloom")
     resonance = _as_float(updated, "resonance")
     collaboration = _as_float(updated, "collaboration")
+    hormone_glow = _as_float(updated, "hormone_glow")
 
     emotion = (
-        emotion * 0.75
-        + memory_bloom * 0.15
-        + resonance * 0.12
-        + collaboration * 0.1
+        emotion * 0.68
+        + memory_bloom * 0.14
+        + resonance * 0.11
+        + collaboration * 0.08
+        + hormone_glow * 0.07
     )
     updated["emotion"] = _clamp(emotion)
 
-    collaboration = collaboration * 0.85 + memory_bloom * 0.1 + resonance * 0.08
+    collaboration = (
+        collaboration * 0.84
+        + memory_bloom * 0.09
+        + resonance * 0.07
+        + hormone_glow * 0.06
+    )
     updated["collaboration"] = _clamp(collaboration)
 
     return updated
@@ -94,12 +105,18 @@ def _grow_memory_garden(state: State, _ctx: object) -> State:
     memory_bloom = _as_float(updated, "memory_bloom")
     diary = _as_float(updated, "diary")
     emotion = _as_float(updated, "emotion")
+    hormone_glow = _as_float(updated, "hormone_glow")
 
-    growth = 0.18 * emotion + 0.14 * diary + 0.08 * (1.0 - memory_bloom)
-    memory_bloom = _clamp(memory_bloom * 0.82 + growth)
+    growth = (
+        0.16 * emotion
+        + 0.13 * diary
+        + 0.07 * (1.0 - memory_bloom)
+        + 0.06 * hormone_glow
+    )
+    memory_bloom = _clamp(memory_bloom * 0.8 + growth)
     updated["memory_bloom"] = memory_bloom
 
-    diary = _clamp(diary * 0.7 + emotion * 0.2 + memory_bloom * 0.15)
+    diary = _clamp(diary * 0.68 + emotion * 0.18 + memory_bloom * 0.12 + hormone_glow * 0.06)
     updated["diary"] = diary
 
     return updated
@@ -112,15 +129,18 @@ def _unlock_dream_isle(state: State, _ctx: object) -> State:
     memory_bloom = _as_float(updated, "memory_bloom")
     dream_isles = _as_float(updated, "dream_isles")
     resonance = _as_float(updated, "resonance")
+    hormone_glow = _as_float(updated, "hormone_glow")
 
-    potential = max(0.0, emotion - 0.6)
+    potential = max(0.0, emotion - 0.6) + hormone_glow * 0.12
     dream_isles = min(
         _DREAM_ISLE_CAP,
-        dream_isles * 0.9 + potential * (0.5 + memory_bloom * 0.35),
+        dream_isles * 0.88 + potential * (0.5 + memory_bloom * 0.33),
     )
     updated["dream_isles"] = dream_isles
 
-    resonance = _clamp(resonance * 0.78 + dream_isles * 0.08 + memory_bloom * 0.12)
+    resonance = _clamp(
+        resonance * 0.72 + dream_isles * 0.08 + memory_bloom * 0.11 + hormone_glow * 0.07
+    )
     updated["resonance"] = resonance
 
     return updated
@@ -133,11 +153,41 @@ def _starlake_ballet(state: State, _ctx: object) -> State:
     emotion = _as_float(updated, "emotion")
     collaboration = _as_float(updated, "collaboration")
     resonance = _as_float(updated, "resonance")
+    hormone_glow = _as_float(updated, "hormone_glow")
 
-    orbit = _clamp(orbit * 0.74 + emotion * 0.18 + collaboration * 0.12)
+    orbit = _clamp(orbit * 0.72 + emotion * 0.16 + collaboration * 0.11 + hormone_glow * 0.07)
     updated["orbit_rhythm"] = orbit
 
-    resonance = _clamp(resonance * 0.7 + orbit * 0.16 + collaboration * 0.08)
+    resonance = _clamp(resonance * 0.68 + orbit * 0.15 + collaboration * 0.08 + hormone_glow * 0.07)
+    updated["resonance"] = resonance
+
+    return updated
+
+
+def _harmonise_hormones(state: State, _ctx: object) -> State:
+    updated = dict(state)
+
+    hormone_glow = _as_float(updated, "hormone_glow")
+    emotion = _as_float(updated, "emotion")
+    resonance = _as_float(updated, "resonance")
+    diary = _as_float(updated, "diary")
+    memory_bloom = _as_float(updated, "memory_bloom")
+
+    baseline = (
+        0.28 * emotion
+        + 0.22 * resonance
+        + 0.18 * diary
+        + 0.16 * memory_bloom
+    )
+    recovery = 0.12 * (1.0 - hormone_glow)
+
+    hormone_glow = _clamp(hormone_glow * 0.8 + baseline * 0.22 + recovery)
+    updated["hormone_glow"] = hormone_glow
+
+    emotion = _clamp(emotion * 0.95 + hormone_glow * 0.05)
+    updated["emotion"] = emotion
+
+    resonance = _clamp(resonance * 0.93 + hormone_glow * 0.05)
     updated["resonance"] = resonance
 
     return updated
@@ -151,6 +201,7 @@ DEFAULT_STATE: MiyuTiantianState = {
     "orbit_rhythm": 0.4,
     "resonance": 0.33,
     "diary": 0.28,
+    "hormone_glow": 0.41,
 }
 
 
@@ -159,6 +210,7 @@ def _build_rules() -> Sequence[Rule]:
         rule("sync-emotion", _sync_emotion),
         rule("memory-garden", _grow_memory_garden),
         rule("unlock-dream-isle", _unlock_dream_isle),
+        rule("harmonise-hormones", _harmonise_hormones),
         rule("starlake-ballet", _starlake_ballet, priority=-1),
     )
 
@@ -200,6 +252,7 @@ class MiyuTiantianBlueprint:
     orbit_rhythm: float = 0.82
     resonance: float = 0.84
     diary: float = 0.78
+    hormone_glow: float = 0.83
 
     def as_state(self) -> MiyuTiantianState:
         return {
@@ -210,6 +263,7 @@ class MiyuTiantianBlueprint:
             "orbit_rhythm": self.orbit_rhythm,
             "resonance": self.resonance,
             "diary": self.diary,
+            "hormone_glow": _clamp(self.hormone_glow),
         }
 
 
@@ -232,13 +286,14 @@ class TiantianLifePulse:
 def _lifeforce_brightness(encounter: MiyuTiantianState) -> float:
     dream_factor = encounter["dream_isles"] / _DREAM_ISLE_CAP
     return (
-        0.24 * encounter["emotion"]
-        + 0.2 * encounter["memory_bloom"]
-        + 0.16 * encounter["collaboration"]
-        + 0.12 * dream_factor
+        0.22 * encounter["emotion"]
+        + 0.18 * encounter["memory_bloom"]
+        + 0.14 * encounter["collaboration"]
+        + 0.1 * dream_factor
         + 0.12 * encounter["resonance"]
         + 0.08 * encounter["orbit_rhythm"]
         + 0.08 * encounter["diary"]
+        + 0.08 * encounter["hormone_glow"]
     )
 
 
@@ -278,6 +333,8 @@ def sweet_lifeforce(
         reasons.append("日记里还有想写下的句子，记录她们的双人宇宙。")
     if encounter["emotion"] >= 0.58:
         reasons.append("情绪仍然温暖地跳动，说明希望正在发芽。")
+    if encounter["hormone_glow"] >= 0.58:
+        reasons.append("激素节律温柔而稳定，身体与心灵同步绽放。")
     if not reasons:
         reasons.append("即使微光也值得守护，甜甜的存在本身就是理由。")
 

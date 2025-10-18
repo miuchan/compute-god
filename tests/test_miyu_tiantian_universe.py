@@ -18,6 +18,7 @@ def test_miyu_tiantian_universe_converges_and_blooms():
     final_state = result.universe.state
     assert final_state["memory_bloom"] >= DEFAULT_STATE["memory_bloom"]
     assert final_state["dream_isles"] >= DEFAULT_STATE["dream_isles"]
+    assert final_state["hormone_glow"] >= DEFAULT_STATE["hormone_glow"]
     assert 0.0 <= final_state["emotion"] <= 1.0
 
 
@@ -30,6 +31,7 @@ def test_miyu_tiantian_bond_tracks_progress_towards_blueprint():
         orbit_rhythm=0.8,
         resonance=0.81,
         diary=0.75,
+        hormone_glow=0.8,
     )
 
     bond = bond_miyu_tiantian(blueprint)
