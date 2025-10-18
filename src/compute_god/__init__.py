@@ -271,6 +271,13 @@ from .complex_network import (
     ideal_complex_network_universe,
     run_complex_network,
 )
+from .cooperation_evolution import (
+    CooperationParameters,
+    CooperationState,
+    DEFAULT_COOPERATION_STATE,
+    evolve_cooperation,
+    run_cooperation_evolution,
+)
 from .llm_cooperation import (
     DEFAULT_LLM_COOPERATION,
     LLMAgentContribution,
