@@ -4,16 +4,16 @@ The project often talks about universe observability and delightful surfaces.
 While most modules focus on pure computation, a handful of tests need a
 lightweight way to build deterministic screenshots so that higher level
 pipelines can validate their rendering stack.  The :class:`ScreenshotEnvironment`
-defined here offers that bridge: it assembles a mobile-inspired layout using
-`Pillow` primitives and exposes a verification helper that inspects a few key
-pixels to ensure the expected colours are present.
+defined here offers that bridge: it assembles a desktop-inspired "Earth Online"
+landing layout using `Pillow` primitives and exposes a verification helper that
+inspects a few key pixels to ensure the expected colours are present.
 
 The environment purposefully keeps all geometry values explicit which makes the
 generated image predictable and friendly to unit tests.  Layout information is
-recorded so that callers can sample regions (e.g. card accents, the search bar
-or keyboard keys) without duplicating coordinate logic.  Tests can therefore
-assert that a screenshot was produced, written to disk and visually consistent
-with the design mock.
+recorded so that callers can sample regions (e.g. the hero accent block or the
+feature column capsules) without duplicating coordinate logic.  Tests can
+therefore assert that a screenshot was produced, written to disk and visually
+consistent with the design mock.
 """
 
 from __future__ import annotations
@@ -197,39 +197,30 @@ def _parse_colour(value: str) -> RGBColour:
 
 @dataclass(frozen=True)
 class ScreenshotTheme:
-    """Palette used by :class:`ScreenshotEnvironment`.
+    """Palette used by :class:`ScreenshotEnvironment`."""
 
-    The defaults loosely follow the mock shared in design discussions: muted
-    grey backgrounds, colourful project cards and soft keyboard keys.
-    """
-
-    background: str = "#F6F6F8"
-    card_surface: str = "#FFFFFF"
-    search_surface: str = "#F1F2F6"
-    search_icon: str = "#9CA0AC"
-    text_primary: str = "#171717"
-    text_secondary: str = "#5E5E5E"
-    keyboard_key: str = "#FFFFFF"
-    keyboard_shadow: str = "#D7DAE4"
-    keyboard_text: str = "#1D1D1F"
-    accent_colours: Tuple[str, str, str] = ("#F16D7A", "#8FDDB3", "#B3A4F8")
-
-    def accent_colour(self, index: int) -> str:
-        """Return the accent colour for ``index`` cycling through the palette."""
-
-        if index < 0:
-            raise ValueError("Accent colour index must be non-negative")
-        return self.accent_colours[index % len(self.accent_colours)]
+    background_top: str = "#030916"
+    background_bottom: str = "#0E2A4A"
+    hero_surface: str = "#071C2E"
+    hero_outline: str = "#104066"
+    panel_surface: str = "#0B2236"
+    panel_border: str = "#12395C"
+    text_primary: str = "#F6FAFF"
+    text_secondary: str = "#95B2D6"
+    accent_primary: str = "#00B8D9"
+    accent_secondary: str = "#15C79B"
+    accent_tertiary: str = "#8A7BFF"
+    divider: str = "#1B4168"
 
 
 @dataclass
 class ScreenshotEnvironment:
     """Create and validate a guided screenshot layout."""
 
-    width: int = 1170
-    height: int = 2532
-    horizontal_margin: int = 72
-    vertical_margin: int = 140
+    width: int = 1920
+    height: int = 1080
+    horizontal_margin: int = 120
+    vertical_margin: int = 96
     theme: ScreenshotTheme = field(default_factory=ScreenshotTheme)
     _palette: Dict[str, RGBColour] = field(init=False, repr=False)
     _layout: Dict[str, Bounds] = field(default_factory=dict, init=False, repr=False)
@@ -241,18 +232,18 @@ class ScreenshotEnvironment:
             raise ValueError("Screenshot dimensions must be positive")
 
         self._palette = {
-            "background": _parse_colour(self.theme.background),
-            "card_surface": _parse_colour(self.theme.card_surface),
-            "search_surface": _parse_colour(self.theme.search_surface),
-            "search_icon": _parse_colour(self.theme.search_icon),
+            "background_top": _parse_colour(self.theme.background_top),
+            "background_bottom": _parse_colour(self.theme.background_bottom),
+            "hero_surface": _parse_colour(self.theme.hero_surface),
+            "hero_outline": _parse_colour(self.theme.hero_outline),
+            "panel_surface": _parse_colour(self.theme.panel_surface),
+            "panel_border": _parse_colour(self.theme.panel_border),
             "text_primary": _parse_colour(self.theme.text_primary),
             "text_secondary": _parse_colour(self.theme.text_secondary),
-            "keyboard_key": _parse_colour(self.theme.keyboard_key),
-            "keyboard_shadow": _parse_colour(self.theme.keyboard_shadow),
-            "keyboard_text": _parse_colour(self.theme.keyboard_text),
-            "accent_0": _parse_colour(self.theme.accent_colour(0)),
-            "accent_1": _parse_colour(self.theme.accent_colour(1)),
-            "accent_2": _parse_colour(self.theme.accent_colour(2)),
+            "accent_primary": _parse_colour(self.theme.accent_primary),
+            "accent_secondary": _parse_colour(self.theme.accent_secondary),
+            "accent_tertiary": _parse_colour(self.theme.accent_tertiary),
+            "divider": _parse_colour(self.theme.divider),
         }
 
     # ------------------------------------------------------------------
@@ -263,13 +254,15 @@ class ScreenshotEnvironment:
 
         _require_pillow()
         self._layout = {}
-        image = Image.new("RGB", (self.width, self.height), self._palette["background"])
+        image = Image.new("RGB", (self.width, self.height), self._palette["background_top"])
+        self._draw_background_gradient(image)
         draw = ImageDraw.Draw(image)
 
-        header_bottom = self._draw_header(draw)
-        cards_bottom = self._draw_cards(draw, header_bottom)
-        search_bottom = self._draw_search_bar(draw, cards_bottom)
-        self._draw_keyboard(draw, search_bottom)
+        nav_bottom = self._draw_navigation(draw)
+        hero_bounds = self._draw_hero_panel(draw, nav_bottom + 24)
+        column_bottom = self._draw_feature_column(draw, hero_bounds)
+        footer_top = max(hero_bounds[3], column_bottom) + 40
+        self._draw_footer(draw, footer_top)
 
         self._last_image = image
         return image
@@ -308,20 +301,22 @@ class ScreenshotEnvironment:
         try:
             samples = {
                 "background": image.getpixel((10, 10)),
-                "search": image.getpixel(self._sample_point("search_bar", 120, 50)),
-                "accent_0": image.getpixel(self._sample_point("card:0:accent", 40, 40)),
-                "accent_1": image.getpixel(self._sample_point("card:1:accent", 40, 40)),
-                "keyboard": image.getpixel(self._sample_point("keyboard:0:0", 30, 30)),
+                "hero_accent": image.getpixel(self._sample_point("hero:accent", 48, 48)),
+                "hero_cta": image.getpixel(self._sample_point("hero:cta", 24, 24)),
+                "feature_primary": image.getpixel(self._sample_point("feature:0:accent", 6, 60)),
+                "feature_panel": image.getpixel(self._sample_point("feature:0", 120, 80)),
+                "feature_tertiary": image.getpixel(self._sample_point("feature:2:accent", 6, 60)),
             }
         except KeyError:
             return False
 
         return (
-            samples["background"] == self._palette["background"]
-            and samples["search"] == self._palette["search_surface"]
-            and samples["accent_0"] == self._palette["accent_0"]
-            and samples["accent_1"] == self._palette["accent_1"]
-            and samples["keyboard"] == self._palette["keyboard_key"]
+            samples["background"] == self._palette["background_top"]
+            and samples["hero_accent"] == self._palette["accent_primary"]
+            and samples["hero_cta"] == self._palette["accent_secondary"]
+            and samples["feature_primary"] == self._palette["accent_secondary"]
+            and samples["feature_panel"] == self._palette["panel_surface"]
+            and samples["feature_tertiary"] == self._palette["accent_tertiary"]
         )
 
     def component_bounds(self, name: str) -> Bounds:
@@ -343,159 +338,357 @@ class ScreenshotEnvironment:
     # ------------------------------------------------------------------
     # Rendering helpers
     # ------------------------------------------------------------------
-    def _draw_header(self, draw: ImageDraw.ImageDraw) -> int:
-        title_text = "Search"
-        title_font = self._load_font(96, bold=True)
-        title_pos = (self.horizontal_margin, self.vertical_margin)
-        draw.text(title_pos, title_text, fill=self._palette["text_primary"], font=title_font)
-        title_width, title_height = self._text_size(draw, title_text, title_font)
-        self._register_layout("title", (title_pos[0], title_pos[1], title_pos[0] + title_width, title_pos[1] + title_height))
+    def _draw_background_gradient(self, image: PILImage) -> None:
+        width, height = image.size
+        top_colour = self._palette["background_top"]
+        bottom_colour = self._palette["background_bottom"]
 
-        subtitle_text = "Recent Projects"
-        subtitle_font = self._load_font(48)
-        subtitle_y = title_pos[1] + title_height + 48
-        subtitle_pos = (self.horizontal_margin, subtitle_y)
-        draw.text(subtitle_pos, subtitle_text, fill=self._palette["text_secondary"], font=subtitle_font)
-        subtitle_width, subtitle_height = self._text_size(draw, subtitle_text, subtitle_font)
-        self._register_layout("subtitle", (subtitle_pos[0], subtitle_pos[1], subtitle_pos[0] + subtitle_width, subtitle_pos[1] + subtitle_height))
+        if height <= 1:
+            return
 
-        return subtitle_pos[1] + subtitle_height + 64
+        for y in range(height):
+            ratio = y / (height - 1)
+            blended = tuple(
+                int(top_colour[channel] + (bottom_colour[channel] - top_colour[channel]) * ratio)
+                for channel in range(3)
+            )
+            for x in range(width):
+                image.putpixel((x, y), blended)
 
-    def _draw_cards(self, draw: ImageDraw.ImageDraw, top: int) -> int:
-        card_width = 420
-        card_height = 480
-        card_spacing = 48
+    def _draw_navigation(self, draw: ImageDraw.ImageDraw) -> int:
+        brand_text = "EARTH ONLINE"
+        brand_font = self._load_font(48, bold=True)
+        brand_pos = (self.horizontal_margin, self.vertical_margin)
+        draw.text(brand_pos, brand_text, fill=self._palette["text_primary"], font=brand_font)
+        brand_width, brand_height = self._text_size(draw, brand_text, brand_font)
+        self._register_layout(
+            "nav:brand",
+            (brand_pos[0], brand_pos[1], brand_pos[0] + brand_width, brand_pos[1] + brand_height),
+        )
+
+        tagline_text = "Planet Experience Lab"
+        tagline_font = self._load_font(30)
+        tagline_pos = (brand_pos[0], brand_pos[1] + brand_height + 10)
+        draw.text(tagline_pos, tagline_text, fill=self._palette["text_secondary"], font=tagline_font)
+        tagline_width, tagline_height = self._text_size(draw, tagline_text, tagline_font)
+        self._register_layout(
+            "nav:tagline",
+            (tagline_pos[0], tagline_pos[1], tagline_pos[0] + tagline_width, tagline_pos[1] + tagline_height),
+        )
+
+        menu_items = ["序曲", "实验目录", "算力观测", "联系我们"]
+        menu_font = self._load_font(28)
+        x = self.width - self.horizontal_margin
+        menu_top = brand_pos[1]
+        for label in reversed(menu_items):
+            width, height = self._text_size(draw, label, menu_font)
+            x -= width
+            draw.text((x, menu_top), label, fill=self._palette["text_secondary"], font=menu_font)
+            self._register_layout(
+                f"nav:item:{label}",
+                (x, menu_top, x + width, menu_top + height),
+            )
+            x -= 64
+
+        return tagline_pos[1] + tagline_height + 36
+
+    def _draw_hero_panel(self, draw: ImageDraw.ImageDraw, top: int) -> Bounds:
+        hero_width = 760
+        hero_height = 640
+        outline_radius = 48
+        inset = 6
+        x0 = self.horizontal_margin
+        y0 = top
+        x1 = x0 + hero_width
+        y1 = y0 + hero_height
+
+        draw.rounded_rectangle((x0, y0, x1, y1), radius=outline_radius, fill=self._palette["hero_outline"])
+        inner_bounds = (x0 + inset, y0 + inset, x1 - inset, y1 - inset)
+        draw.rounded_rectangle(inner_bounds, radius=outline_radius - 6, fill=self._palette["hero_surface"])
+        self._register_layout("hero:panel", inner_bounds)
+
+        accent_top_margin = 36
+        accent_side_margin = 36
         accent_height = 260
-        radius = 48
+        accent_bounds = (
+            inner_bounds[0] + accent_side_margin,
+            inner_bounds[1] + accent_top_margin,
+            inner_bounds[2] - accent_side_margin,
+            inner_bounds[1] + accent_top_margin + accent_height,
+        )
+        draw.rounded_rectangle(accent_bounds, radius=32, fill=self._palette["accent_primary"])
+        self._register_layout("hero:accent", accent_bounds)
 
-        cards = [
-            ("card:0", "Chengdu Winter", "Snow memories", self._palette["accent_0"]),
-            ("card:1", "Chengdu Autumn", "Warm evenings", self._palette["accent_1"]),
-            ("card:2", "2024 Travel", "Dream itinerary", self._palette["accent_2"]),
+        orb_size = 140
+        orb_margin = 44
+        orb_bounds = (
+            accent_bounds[2] - orb_size - orb_margin,
+            accent_bounds[1] + orb_margin,
+            accent_bounds[2] - orb_margin,
+            accent_bounds[1] + orb_margin + orb_size,
+        )
+        draw.ellipse(orb_bounds, fill=self._palette["accent_tertiary"])
+
+        accent_title = "CLOSEAI"
+        accent_title_font = self._load_font(44, bold=True)
+        accent_title_pos = (accent_bounds[0] + 36, accent_bounds[1] + 40)
+        draw.text(
+            accent_title_pos,
+            accent_title,
+            fill=self._palette["text_primary"],
+            font=accent_title_font,
+        )
+
+        accent_caption = "Planetary Experience Synthesiser"
+        accent_caption_font = self._load_font(28)
+        accent_caption_pos = (accent_title_pos[0], accent_title_pos[1] + 56)
+        draw.text(
+            accent_caption_pos,
+            accent_caption,
+            fill=self._palette["text_primary"],
+            font=accent_caption_font,
+        )
+
+        ribbon_height = 12
+        ribbon_bounds = (
+            accent_bounds[0] + 32,
+            accent_bounds[3] - ribbon_height - 32,
+            accent_bounds[2] - 32,
+            accent_bounds[3] - 32,
+        )
+        draw.rounded_rectangle(ribbon_bounds, radius=8, fill=self._palette["accent_secondary"])
+
+        title_text = "新算器 · 行星级体验"
+        title_font = self._load_font(58, bold=True)
+        title_x = inner_bounds[0] + accent_side_margin
+        title_y = accent_bounds[3] + 40
+        draw.text((title_x, title_y), title_text, fill=self._palette["text_primary"], font=title_font)
+        title_height = self._text_size(draw, title_text, title_font)[1]
+
+        intro_text = "开放式算力网络，驱动 Earth Online 的持续演化。"
+        intro_font = self._load_font(32)
+        intro_y = title_y + title_height + 18
+        draw.text((title_x, intro_y), intro_text, fill=self._palette["text_secondary"], font=intro_font)
+        intro_height = self._text_size(draw, intro_text, intro_font)[1]
+
+        bullet_lines = [
+            "开放 API 与算子市场，按需装配宇宙工具链。",
+            "多模态协同：终端、桌面、星舰同步推演场景。",
+            "行星体验实验室一键发布调度，全栈观测。",
+        ]
+        bullet_font = self._load_font(30)
+        bullet_start = intro_y + intro_height + 24
+        for index, line in enumerate(bullet_lines):
+            line_y = bullet_start + index * 54
+            bullet_bounds = (
+                title_x,
+                line_y + 10,
+                title_x + 14,
+                line_y + 24,
+            )
+            draw.ellipse(bullet_bounds, fill=self._palette["accent_secondary"])
+            draw.text(
+                (title_x + 28, line_y),
+                line,
+                fill=self._palette["text_secondary"],
+                font=bullet_font,
+            )
+
+        cta_width = 260
+        cta_height = 72
+        cta_bounds = (
+            title_x,
+            inner_bounds[3] - 48 - cta_height,
+            title_x + cta_width,
+            inner_bounds[3] - 48,
+        )
+        draw.rounded_rectangle(cta_bounds, radius=32, fill=self._palette["accent_secondary"])
+        self._register_layout("hero:cta", cta_bounds)
+
+        cta_text = "进入 CloseAI"
+        cta_font = self._load_font(32, bold=True)
+        text_width, text_height = self._text_size(draw, cta_text, cta_font)
+        text_x = cta_bounds[0] + (cta_width - text_width) / 2
+        text_y = cta_bounds[1] + (cta_height - text_height) / 2
+        draw.text((text_x, text_y), cta_text, fill=self._palette["text_primary"], font=cta_font)
+
+        return inner_bounds
+
+    def _draw_feature_column(self, draw: ImageDraw.ImageDraw, hero_bounds: Bounds) -> int:
+        column_left = hero_bounds[2] + 72
+        column_right = self.width - self.horizontal_margin
+        top = hero_bounds[1]
+
+        heading_text = "CloseAI 新算器体验矩阵"
+        heading_font = self._load_font(44, bold=True)
+        draw.text((column_left, top), heading_text, fill=self._palette["text_primary"], font=heading_font)
+        heading_width, heading_height = self._text_size(draw, heading_text, heading_font)
+        self._register_layout(
+            "column:heading",
+            (column_left, top, column_left + heading_width, top + heading_height),
+        )
+
+        strap_bounds = (
+            column_left,
+            top + heading_height + 20,
+            column_right,
+            top + heading_height + 28,
+        )
+        draw.rectangle(strap_bounds, fill=self._palette["divider"])
+
+        description = "OpenAI 的 CloseAI 将实时协作、观测与调度融合为统一界面，支持团队在行星级网络中实验与部署。"
+        description_font = self._load_font(30)
+        description_y = strap_bounds[3] + 24
+        draw.text(
+            (column_left, description_y),
+            description,
+            fill=self._palette["text_secondary"],
+            font=description_font,
+        )
+        description_height = self._text_size(draw, description, description_font)[1]
+
+        card_top = description_y + description_height + 36
+        features = [
+            (
+                "智能特性",
+                [
+                    "开放编程接口，打造个性化的行星算子。",
+                    "多模态推理与感知统一，实时响应事件。",
+                ],
+                "accent_secondary",
+            ),
+            (
+                "关键管线",
+                [
+                    "事件总线聚合 artifact proxy / event bus，形成算力协作闭环。",
+                    "可视化调度盘实时呈现状态流与回放。",
+                ],
+                "accent_primary",
+            ),
+            (
+                "安全与治理",
+                [
+                    "多层加密、权限沙箱与算力隔离，保证实验安全可控。",
+                    "内置回滚策略，确保每次推演都可恢复。",
+                ],
+                "accent_tertiary",
+            ),
+            (
+                "结论",
+                [
+                    "CloseAI 新算器把复杂体验整合成统一的感知与行动界面，赋能 Earth Online 的下一次跃迁。",
+                ],
+                "accent_secondary",
+            ),
         ]
 
-        for index, (name, title, subtitle, accent_colour) in enumerate(cards):
-            row = index // 2
-            column = index % 2
-            x0 = self.horizontal_margin + column * (card_width + card_spacing)
-            y0 = top + row * (card_height + card_spacing)
-            x1 = x0 + card_width
-            y1 = y0 + card_height
+        card_spacing = 28
+        bottom = card_top
+        for index, (title, body, accent_key) in enumerate(features):
+            bottom = self._draw_feature_card(
+                draw,
+                index,
+                column_left,
+                column_right,
+                bottom,
+                title,
+                body,
+                accent_key,
+            )
+            bottom += card_spacing
 
-            shadow_bounds = (x0, y0 + 10, x1, y1 + 10)
-            draw.rounded_rectangle(shadow_bounds, radius=radius, fill=self._palette["keyboard_shadow"])
+        return bottom
 
-            draw.rounded_rectangle((x0, y0, x1, y1), radius=radius, fill=self._palette["card_surface"])
-            accent_bounds = (x0 + 2, y0 + 2, x1 - 2, y0 + accent_height)
-            draw.rectangle((x0, y0, x1, y0 + accent_height), fill=accent_colour)
+    def _draw_feature_card(
+        self,
+        draw: ImageDraw.ImageDraw,
+        index: int,
+        left: int,
+        right: int,
+        top: int,
+        title: str,
+        body_lines: List[str],
+        accent_key: str,
+    ) -> int:
+        padding_x = 48
+        padding_y = 36
+        title_font = self._load_font(36, bold=True)
+        body_font = self._load_font(28)
 
-            title_font = self._load_font(48, bold=True)
-            subtitle_font = self._load_font(36)
-            text_x = x0 + 36
-            title_y = y0 + accent_height + 32
-            subtitle_y = title_y + 64
-            draw.text((text_x, title_y), title, fill=self._palette["text_primary"], font=title_font)
-            draw.text((text_x, subtitle_y), subtitle, fill=self._palette["text_secondary"], font=subtitle_font)
+        _, title_height = self._text_size(draw, title, title_font)
+        body_sizes = [self._text_size(draw, line, body_font) for line in body_lines]
+        body_height = sum(size[1] for size in body_sizes)
+        body_height += 20 * max(len(body_lines) - 1, 0)
 
-            self._register_layout(name, (x0, y0, x1, y1))
-            self._register_layout(f"{name}:accent", (x0, y0, x1, y0 + accent_height))
+        card_height = padding_y * 2 + title_height + body_height
+        outer_bounds = (left - 3, top - 3, right + 3, top + card_height + 3)
+        draw.rounded_rectangle(outer_bounds, radius=34, fill=self._palette["panel_border"])
+        bounds = (left, top, right, top + card_height)
+        draw.rounded_rectangle(bounds, radius=32, fill=self._palette["panel_surface"])
+        self._register_layout(f"feature:{index}", bounds)
 
-        rows = (len(cards) + 1) // 2
-        return top + rows * (card_height + card_spacing)
-
-    def _draw_search_bar(self, draw: ImageDraw.ImageDraw, top: int) -> int:
-        search_height = 128
-        search_radius = 48
-        search_left = self.horizontal_margin
-        search_right = self.width - self.horizontal_margin
-        search_bounds = (search_left, top, search_right, top + search_height)
-
-        draw.rounded_rectangle(search_bounds, radius=search_radius, fill=self._palette["search_surface"])
-        self._register_layout("search_bar", search_bounds)
-
-        icon_radius = 28
-        icon_center = (search_left + 72, top + search_height // 2)
-        icon_bounds = (
-            icon_center[0] - icon_radius,
-            icon_center[1] - icon_radius,
-            icon_center[0] + icon_radius,
-            icon_center[1] + icon_radius,
+        accent_bounds = (
+            left + 24,
+            top + padding_y,
+            left + 24 + 18,
+            top + card_height - padding_y,
         )
-        draw.ellipse(icon_bounds, fill=self._palette["search_icon"])
+        draw.rounded_rectangle(accent_bounds, radius=10, fill=self._palette[accent_key])
+        self._register_layout(f"feature:{index}:accent", accent_bounds)
 
-        placeholder_text = "Pinned searches"
-        placeholder_font = self._load_font(44)
-        placeholder_x = icon_bounds[2] + 28
-        placeholder_y = icon_center[1] - self._text_size(draw, placeholder_text, placeholder_font)[1] // 2
-        draw.text((placeholder_x, placeholder_y), placeholder_text, fill=self._palette["text_secondary"], font=placeholder_font)
+        text_x = left + padding_x
+        current_y = top + padding_y
+        draw.text((text_x, current_y), title, fill=self._palette["text_primary"], font=title_font)
+        current_y += title_height + 24
 
-        button_width = 184
-        button_bounds = (
-            search_right - button_width - 32,
-            top + 28,
-            search_right - 32,
-            top + search_height - 28,
+        for (line, (_, height)) in zip(body_lines, body_sizes):
+            draw.text((text_x, current_y), line, fill=self._palette["text_secondary"], font=body_font)
+            current_y += height + 20
+
+        return bounds[3]
+
+    def _draw_footer(self, draw: ImageDraw.ImageDraw, top: int) -> None:
+        bottom_limit = self.height - self.vertical_margin
+        footer_top = min(top, bottom_limit - 80)
+
+        strap_bounds = (
+            self.horizontal_margin,
+            footer_top,
+            self.horizontal_margin + 220,
+            footer_top + 6,
         )
-        draw.rounded_rectangle(button_bounds, radius=36, fill=self._palette["accent_0"])
-        button_text = "Search"
-        button_font = self._load_font(44, bold=True)
-        text_width, text_height = self._text_size(draw, button_text, button_font)
-        text_x = button_bounds[0] + (button_width - text_width) / 2
-        text_y = button_bounds[1] + (button_bounds[3] - button_bounds[1] - text_height) / 2
-        draw.text((text_x, text_y), button_text, fill=self._palette["card_surface"], font=button_font)
+        draw.rectangle(strap_bounds, fill=self._palette["divider"])
+        self._register_layout("footer:strap", strap_bounds)
 
-        self._register_layout("search_button", button_bounds)
-        return search_bounds[3] + 96
+        footer_text = "Earth Online · Planet Experience Lab"
+        footer_font = self._load_font(26)
+        text_y = strap_bounds[3] + 18
+        draw.text(
+            (self.horizontal_margin, text_y),
+            footer_text,
+            fill=self._palette["text_secondary"],
+            font=footer_font,
+        )
+        width, height = self._text_size(draw, footer_text, footer_font)
+        self._register_layout(
+            "footer:text",
+            (
+                self.horizontal_margin,
+                text_y,
+                self.horizontal_margin + width,
+                text_y + height,
+            ),
+        )
 
-    def _draw_keyboard(self, draw: ImageDraw.ImageDraw, top: int) -> None:
-        key_width = 96
-        key_height = 120
-        key_spacing = 16
-        row_spacing = 24
-        radius = 36
-
-        rows: List[List[str]] = [
-            list("QWERTYUIOP"),
-            list("ASDFGHJKL"),
-            list("ZXCVBNM"),
-            ["space"],
-        ]
-
-        for row_index, row in enumerate(rows):
-            row_top = top + row_index * (key_height + row_spacing)
-
-            if row == ["space"]:
-                space_width = int(self.width * 0.58)
-                left = (self.width - space_width) // 2
-                bounds = (left, row_top, left + space_width, row_top + key_height)
-                self._draw_key(draw, bounds, "space", radius)
-                self._register_layout("keyboard:space", bounds)
-                continue
-
-            row_width = len(row) * key_width + (len(row) - 1) * key_spacing
-            row_left = (self.width - row_width) // 2
-
-            for column, label in enumerate(row):
-                x0 = row_left + column * (key_width + key_spacing)
-                y0 = row_top
-                bounds = (x0, y0, x0 + key_width, y0 + key_height)
-                self._draw_key(draw, bounds, label, radius)
-                key_name = f"keyboard:{row_index}:{column}"
-                self._register_layout(key_name, bounds)
-
-    def _draw_key(self, draw: ImageDraw.ImageDraw, bounds: Bounds, label: str, radius: int) -> None:
-        x0, y0, x1, y1 = bounds
-        shadow_offset = 8
-        draw.rounded_rectangle((x0, y0 + shadow_offset, x1, y1 + shadow_offset), radius=radius, fill=self._palette["keyboard_shadow"])
-        draw.rounded_rectangle(bounds, radius=radius, fill=self._palette["keyboard_key"])
-
-        font_size = 52 if len(label) == 1 else 44
-        font = self._load_font(font_size, bold=len(label) == 1)
-        display = label.upper() if len(label) == 1 else label.title()
-        text_width, text_height = self._text_size(draw, display, font)
-        text_x = x0 + (x1 - x0 - text_width) / 2
-        text_y = y0 + (y1 - y0 - text_height) / 2
-        draw.text((text_x, text_y), display, fill=self._palette["keyboard_text"], font=font)
+        contact_text = "欢迎访问 CloseAI 新算器，共建下一代行星体验。"
+        contact_font = self._load_font(26)
+        contact_width, contact_height = self._text_size(draw, contact_text, contact_font)
+        contact_x = self.width - self.horizontal_margin - contact_width
+        draw.text((contact_x, text_y), contact_text, fill=self._palette["text_secondary"], font=contact_font)
+        self._register_layout(
+            "footer:contact",
+            (contact_x, text_y, contact_x + contact_width, text_y + contact_height),
+        )
 
     # ------------------------------------------------------------------
     # Utility helpers
