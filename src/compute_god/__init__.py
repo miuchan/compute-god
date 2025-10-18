@@ -1,7 +1,13 @@
 """Compute-God Python runtime."""
 
+from __future__ import annotations
+
+from importlib import metadata as _importlib_metadata
+from pathlib import Path
 from types import ModuleType
 import sys
+import tomllib
+from typing import Any
 
 from .guidance import DeskStation, GuidanceDesk
 from .catalogue import build_guidance_desk, iter_export_names
@@ -108,6 +114,50 @@ from .live_and_let_live import (
     run_live_and_let_live,
     让自己活也让别人活,
 )
+
+
+def _find_pyproject_file() -> Path | None:
+    """Return the nearest ``pyproject.toml`` file, if available."""
+
+    for parent in Path(__file__).resolve().parents:
+        candidate = parent / "pyproject.toml"
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def _load_local_version(pyproject: Path) -> str | None:
+    """Load the package version from a local ``pyproject.toml`` file."""
+
+    try:
+        with pyproject.open("rb") as stream:
+            data: dict[str, Any] = tomllib.load(stream)
+    except (OSError, tomllib.TOMLDecodeError):  # pragma: no cover - defensive guard
+        return None
+
+    project = data.get("project")
+    if isinstance(project, dict):
+        version = project.get("version")
+        if isinstance(version, str):
+            return version
+    return None
+
+
+def _load_version() -> str:
+    """Best-effort loader for the distribution version string."""
+
+    try:
+        return _importlib_metadata.version("compute-god")
+    except _importlib_metadata.PackageNotFoundError:
+        pyproject = _find_pyproject_file()
+        if pyproject is not None:
+            version = _load_local_version(pyproject)
+            if version is not None:
+                return version
+    return "0.0.0"
+
+
+__version__ = _load_version()
 
 
 def _register_compat_module(name: str, **attrs: object) -> ModuleType:
@@ -490,5 +540,6 @@ __all__.extend([
     "known_compression_algorithms",
     "plan_repository_compression",
 ])
+__all__.append("__version__")
 
 del _GUIDANCE_SYMBOLS
