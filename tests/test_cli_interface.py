@@ -9,6 +9,12 @@ from pytest import CaptureFixture
 from compute_god.cli import main
 
 
+def _read_version() -> str:
+    from compute_god import __version__
+
+    return __version__
+
+
 def test_stations_text_output(capsys: CaptureFixture[str]) -> None:
     exit_code = main(["stations"])
     captured = capsys.readouterr()
@@ -53,4 +59,11 @@ def test_unknown_reference_returns_error(capsys: CaptureFixture[str]) -> None:
     captured = capsys.readouterr()
     assert exit_code == 1
     assert "unknown guidance reference" in captured.err
+
+
+def test_version_command_outputs_package_version(capsys: CaptureFixture[str]) -> None:
+    exit_code = main(["version"])
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert captured.out.strip() == _read_version()
 

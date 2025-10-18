@@ -40,6 +40,7 @@ import sys
 from collections.abc import Iterable, Mapping
 
 from . import guidance_desk as _guidance_desk
+from . import __version__ as _package_version
 
 
 def _format_station_text(name: str, description: str, entries: Iterable[str]) -> str:
@@ -111,6 +112,11 @@ def _handle_resolve(args: argparse.Namespace) -> int:
     return 0
 
 
+def _handle_version(_: argparse.Namespace) -> int:
+    sys.stdout.write(f"{_package_version}\n")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Return the top-level CLI argument parser."""
 
@@ -147,6 +153,11 @@ def build_parser() -> argparse.ArgumentParser:
         "reference", help="Guidance reference in 'station.entry' form."
     )
     resolve_parser.set_defaults(handler=_handle_resolve)
+
+    version_parser = subparsers.add_parser(
+        "version", help="Show the installed Compute-God package version."
+    )
+    version_parser.set_defaults(handler=_handle_version)
 
     return parser
 
