@@ -158,6 +158,7 @@ from .bingzi import (
     未亮子,
     未明子,
 )
+from .panzi import Panzi, PanziObservation, PanziOrigin, explore_origin, 磐子
 from .jizi import (
     Jizi,
     ThermalDual,
