@@ -76,7 +76,8 @@
 1. 在 PyPI 项目的 `Publishing` 设置中添加当前 GitHub 仓库为 trusted publisher。
 2. 在 GitHub 上创建新的 Release（`Draft a new release`），tag 需与版本号一致（如 `v0.2.0`）。
 3. Release 发布后，workflow 会自动：
-   - 下载源码并运行构建；
+   - 使用 `uv sync --dev` 拉取依赖，并运行 `ruff`、`mypy` 与 `pytest` 做质量检查；
+   - 在干净环境中执行 `uv run python -m build` 构建分发包；
    - 将 `dist/` 中的制品上传为 release artifact；
    - 通过 OpenID Connect 与 PyPI 建立信任并上传分发包。
 
