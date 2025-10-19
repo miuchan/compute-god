@@ -116,6 +116,11 @@ from .leshan_buddha import (
     build_leshan_buddha,
     iter_segment_features,
 )
+from .lehuo_lefo import (
+    LehuoLefoThermalDual,
+    lehuo_lefo_thermal_dual,
+    乐活乐佛热对偶,
+)
 try:  # pragma: no cover - optional dependency during import
     from .self_application_er_epr import (
         bell_state,
