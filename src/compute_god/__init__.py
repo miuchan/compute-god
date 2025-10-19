@@ -84,6 +84,15 @@ from .landscape_learning import (
     landscape_learning_universe,
     learn_landscape,
 )
+from .limit_language import (
+    ComputableFunction,
+    DomainSpec,
+    LimitApproach,
+    LimitProgram,
+    LimitResult,
+    LimitStatement,
+    parse_limit_language,
+)
 from .factorio import (
     FactoryBalance,
     FactoryBlueprint,
