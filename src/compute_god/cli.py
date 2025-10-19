@@ -36,11 +36,21 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 import sys
 from collections.abc import Iterable, Mapping
+from typing import TYPE_CHECKING
 
 from . import guidance_desk as _guidance_desk
 from . import __version__ as _package_version
+
+try:  # pragma: no cover - optional NumPy dependency
+    from .feynman_wormhole_lab import DiagramLeg, Propagator, run_feynman_wormhole_lab
+except ImportError:  # pragma: no cover - align with lazy import semantics
+    DiagramLeg = Propagator = run_feynman_wormhole_lab = None  # type: ignore[assignment]
+
+if TYPE_CHECKING:  # pragma: no cover - imported for typing only
+    from .feynman_wormhole_lab import BridgeSummary
 
 
 def _format_station_text(name: str, description: str, entries: Iterable[str]) -> str:
@@ -117,6 +127,116 @@ def _handle_version(_: argparse.Namespace) -> int:
     return 0
 
 
+def _wormhole_payload(summary: "BridgeSummary") -> dict[str, object]:
+    return {
+        "left_labels": list(summary.left_labels),
+        "right_labels": list(summary.right_labels),
+        "temperature": summary.temperature,
+        "bridge_strength": summary.bridge_strength,
+        "entanglement_bits": summary.entanglement_bits,
+        "schmidt_coefficients": list(summary.schmidt_coefficients),
+        "propagator_matrix": summary.propagator_matrix.tolist(),
+        "state_vector": summary.state_vector.tolist(),
+    }
+
+
+def _format_wormhole_text(summary: "BridgeSummary") -> str:
+    import numpy as np  # local import to avoid mandatory dependency at module import time
+
+    matrix_str = np.array2string(summary.propagator_matrix, precision=6)
+    state_str = np.array2string(summary.state_vector, precision=6)
+    lines = [
+        "Feynman wormhole bridge summary",
+        f"  Left boundary legs: {', '.join(summary.left_labels)}",
+        f"  Right boundary legs: {', '.join(summary.right_labels)}",
+        f"  Temperature: {summary.temperature:.6g}",
+        f"  Bridge strength: {summary.bridge_strength:.6g}",
+        f"  Entanglement entropy (bits): {summary.entanglement_bits:.6g}",
+        f"  Schmidt coefficients: {', '.join(f'{value:.6g}' for value in summary.schmidt_coefficients)}",
+        "  Propagator matrix:",
+        "    " + matrix_str.replace("\n", "\n    "),
+        "  State vector:",
+        "    " + state_str.replace("\n", "\n    "),
+    ]
+    return "\n".join(lines)
+
+
+def _load_wormhole_configuration(path: Path) -> tuple[list["DiagramLeg"], list["Propagator"], float]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        raise ValueError(f"configuration file not found: {path}") from None
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"failed to decode JSON: {exc}") from None
+
+    try:
+        legs_data = payload["legs"]
+        propagators_data = payload["propagators"]
+    except KeyError as exc:
+        raise ValueError(f"missing field in configuration: {exc.args[0]}") from None
+
+    if not isinstance(legs_data, list) or not isinstance(propagators_data, list):
+        raise ValueError("'legs' and 'propagators' must be lists")
+
+    if DiagramLeg is None or Propagator is None:
+        raise ImportError("compute_god.feynman_wormhole_lab requires numpy")
+
+    legs = []
+    for entry in legs_data:
+        if not isinstance(entry, dict):
+            raise ValueError("each leg must be an object with 'label' and 'boundary'")
+        try:
+            legs.append(DiagramLeg(label=entry["label"], boundary=entry["boundary"]))
+        except KeyError as exc:
+            raise ValueError(f"leg definition missing field: {exc.args[0]}") from None
+
+    propagators = []
+    for entry in propagators_data:
+        if not isinstance(entry, dict):
+            raise ValueError("each propagator must be an object with 'source' and 'target'")
+        try:
+            propagators.append(
+                Propagator(
+                    source=entry["source"],
+                    target=entry["target"],
+                    amplitude=float(entry.get("amplitude", 1.0)),
+                    proper_time=float(entry.get("proper_time", 1.0)),
+                )
+            )
+        except KeyError as exc:
+            raise ValueError(f"propagator definition missing field: {exc.args[0]}") from None
+
+    temperature_raw = payload.get("temperature", 1.0)
+    try:
+        temperature = float(temperature_raw)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("temperature must be a number") from exc
+
+    return legs, propagators, temperature
+
+
+def _handle_wormhole_lab(args: argparse.Namespace) -> int:
+    if run_feynman_wormhole_lab is None:
+        sys.stderr.write("compute_god.feynman_wormhole_lab requires numpy\n")
+        return 1
+
+    try:
+        legs, propagators, temperature = _load_wormhole_configuration(Path(args.config))
+    except (ValueError, ImportError) as exc:
+        sys.stderr.write(f"{exc}\n")
+        return 1
+
+    summary = run_feynman_wormhole_lab(legs, propagators, temperature=temperature)
+
+    if args.format == "json":
+        json.dump(_wormhole_payload(summary), sys.stdout, ensure_ascii=False, indent=2)
+        sys.stdout.write("\n")
+        return 0
+
+    sys.stdout.write(_format_wormhole_text(summary) + "\n")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Return the top-level CLI argument parser."""
 
@@ -158,6 +278,18 @@ def build_parser() -> argparse.ArgumentParser:
         "version", help="Show the installed Compute-God package version."
     )
     version_parser.set_defaults(handler=_handle_version)
+
+    wormhole_parser = subparsers.add_parser(
+        "wormhole-lab", help="Analyse a Feynman diagram as a wormhole bridge."
+    )
+    wormhole_parser.add_argument("config", help="Path to a JSON configuration file.")
+    wormhole_parser.add_argument(
+        "--format",
+        choices=("text", "json"),
+        default="text",
+        help="Output format for the bridge summary.",
+    )
+    wormhole_parser.set_defaults(handler=_handle_wormhole_lab)
 
     return parser
 

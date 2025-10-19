@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
+import pytest
 from pytest import CaptureFixture
 
 from compute_god.cli import main
@@ -66,4 +68,32 @@ def test_version_command_outputs_package_version(capsys: CaptureFixture[str]) ->
     captured = capsys.readouterr()
     assert exit_code == 0
     assert captured.out.strip() == _read_version()
+
+
+def test_wormhole_lab_cli_generates_json(tmp_path: Path, capsys: CaptureFixture[str]) -> None:
+    np = pytest.importorskip("numpy")
+
+    config = {
+        "legs": [
+            {"label": "L0", "boundary": "left"},
+            {"label": "R0", "boundary": "right"},
+        ],
+        "propagators": [
+            {"source": "L0", "target": "R0", "amplitude": 1.0, "proper_time": 0.5},
+        ],
+        "temperature": 0.25,
+    }
+
+    config_path = tmp_path / "wormhole.json"
+    config_path.write_text(json.dumps(config), encoding="utf-8")
+
+    exit_code = main(["wormhole-lab", str(config_path), "--format", "json"])
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    assert payload["left_labels"] == ["L0"]
+    assert payload["right_labels"] == ["R0"]
+    assert payload["temperature"] == pytest.approx(0.25)
+    assert payload["propagator_matrix"] == [[pytest.approx(float(np.exp(-0.5 * 0.25)))]]
 
