@@ -125,6 +125,14 @@ from .live_and_let_live import (
     run_live_and_let_live,
     让自己活也让别人活,
 )
+from .shulikou import (
+    ShuliKouBlueprint,
+    ShuliKouGlyph,
+    ShuliKouReading,
+    ShuliKouVector,
+    compose_shuli_channels,
+    术力口,
+)
 from .yin_yang_wu_xing import (
     Element,
     Polarity,
