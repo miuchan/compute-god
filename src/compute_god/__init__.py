@@ -108,6 +108,14 @@ from .gift import (
     prepare_gift_canvas,
     sculpt_gift_landscape,
 )
+from .leshan_buddha import (
+    BuddhaSegment,
+    DrainageChannel,
+    LeshanBuddhaModel,
+    ObservationPlatform,
+    build_leshan_buddha,
+    iter_segment_features,
+)
 try:  # pragma: no cover - optional dependency during import
     from .self_application_er_epr import (
         bell_state,
