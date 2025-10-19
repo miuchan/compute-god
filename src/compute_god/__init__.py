@@ -133,6 +133,12 @@ from .shulikou import (
     compose_shuli_channels,
     术力口,
 )
+from .shulikou_cloud_village import (
+    CloudVillageCooperative,
+    CooperativeInitiative,
+    CooperativeMember,
+    build_shulikou_cloud_village,
+)
 from .yin_yang_wu_xing import (
     Element,
     Polarity,
