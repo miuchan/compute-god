@@ -367,6 +367,16 @@ from .entangle import (
     缠子,
     纠缠子,
 )
+from .quantum_decoherence import (
+    KNOWN_QUANTUM_MECHANISMS,
+    DecoherenceEnvironment,
+    DecoherenceLedger,
+    DecoherenceResult,
+    QuantumMechanism,
+    decohere_all_known_quantum_mechanisms,
+    decoherence_for_mechanism,
+    退相干所有量子机制,
+)
 from .anti_quantum import (
     AntiQuantumAlgorithm,
     AntiQuantumDual,
