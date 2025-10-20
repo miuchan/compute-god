@@ -222,6 +222,20 @@ _RAW_STATION_BLUEPRINT: tuple[StationLayout, ...] = (
         ),
     ),
     (
+        "quantum_decoherence",
+        "量子机制退相干的环境账本。",
+        (
+            "QuantumMechanism",
+            "DecoherenceEnvironment",
+            "DecoherenceResult",
+            "DecoherenceLedger",
+            "KNOWN_QUANTUM_MECHANISMS",
+            "decohere_all_known_quantum_mechanisms",
+            "decoherence_for_mechanism",
+            "退相干所有量子机制",
+        ),
+    ),
+    (
         "anti_quantum",
         "抗量子算法与对偶建模。",
         (
