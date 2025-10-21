@@ -69,6 +69,43 @@ def _station_payload(description: str, entries: Iterable[str]) -> Mapping[str, o
     }
 
 
+def _matches_query(value: str, query: str, *, case_sensitive: bool) -> bool:
+    if not value:
+        return False
+    return (query in value) if case_sensitive else (query.casefold() in value.casefold())
+
+
+def _search_catalogue(
+    query: str,
+    *,
+    case_sensitive: bool,
+) -> list[tuple[str, str, str]]:
+    desk = _guidance_desk()
+    if not query:
+        raise ValueError("search query must not be empty")
+
+    matches: list[tuple[str, str, str]] = []
+    for station_name, station in desk.items():
+        station_match = _matches_query(station_name, query, case_sensitive=case_sensitive) or _matches_query(
+            station.description, query, case_sensitive=case_sensitive
+        )
+        for entry in station.catalog():
+            if station_match or _matches_query(entry, query, case_sensitive=case_sensitive):
+                matches.append((station_name, entry, station.description))
+    return matches
+
+
+def _format_search_text(query: str, matches: Iterable[tuple[str, str, str]]) -> str:
+    lines = [f"Search results for {query!r}:"]
+    appended = False
+    for station, entry, _ in matches:
+        lines.append(f"  - {station}.{entry}")
+        appended = True
+    if not appended:
+        lines.append("  (no matches found)")
+    return "\n".join(lines)
+
+
 def _handle_stations(args: argparse.Namespace) -> int:
     desk = _guidance_desk()
     if args.format == "json":
@@ -107,6 +144,35 @@ def _handle_station(args: argparse.Namespace) -> int:
         return 0
 
     sys.stdout.write(_format_station_text(args.name, station.description, station.catalog()) + "\n")
+    return 0
+
+
+def _handle_search(args: argparse.Namespace) -> int:
+    try:
+        matches = _search_catalogue(args.query, case_sensitive=args.case_sensitive)
+    except ValueError as exc:
+        sys.stderr.write(f"{exc}\n")
+        return 1
+
+    if args.format == "json":
+        payload = {
+            "query": args.query,
+            "case_sensitive": args.case_sensitive,
+            "matches": [
+                {
+                    "station": station,
+                    "entry": entry,
+                    "reference": f"{station}.{entry}",
+                    "station_description": description,
+                }
+                for station, entry, description in matches
+            ],
+        }
+        json.dump(payload, sys.stdout, ensure_ascii=False, indent=2)
+        sys.stdout.write("\n")
+        return 0
+
+    sys.stdout.write(_format_search_text(args.query, matches) + "\n")
     return 0
 
 
@@ -265,6 +331,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output format.",
     )
     station_parser.set_defaults(handler=_handle_station)
+
+    search_parser = subparsers.add_parser(
+        "search", help="Search entries across all stations."
+    )
+    search_parser.add_argument("query", help="Substring to match against station and entry names.")
+    search_parser.add_argument(
+        "--format",
+        choices=("text", "json"),
+        default="text",
+        help="Output format.",
+    )
+    search_parser.add_argument(
+        "--case-sensitive",
+        action="store_true",
+        help="Perform a case-sensitive search.",
+    )
+    search_parser.set_defaults(handler=_handle_search)
 
     resolve_parser = subparsers.add_parser(
         "resolve", help="Resolve a reference such as 'core.God'."
