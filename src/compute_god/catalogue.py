@@ -602,6 +602,17 @@ _RAW_STATION_BLUEPRINT: tuple[StationLayout, ...] = (
         ),
     ),
     (
+        "earth_online_council",
+        "地球 Online AI 议会协同推演。",
+        (
+            "CouncilAgenda",
+            "CouncilMandate",
+            "CouncilMember",
+            "council_transition",
+            "simulate_ai_council",
+        ),
+    ),
+    (
         "shuangxiang",
         "双相梯度下降与相关优化。",
         (
