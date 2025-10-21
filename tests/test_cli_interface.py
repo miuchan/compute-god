@@ -42,6 +42,32 @@ def test_station_lookup(capsys: CaptureFixture[str]) -> None:
     assert "God" in captured.out
 
 
+def test_search_command_lists_matches(capsys: CaptureFixture[str]) -> None:
+    exit_code = main(["search", "god"])
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    lines = captured.out.strip().splitlines()
+    assert lines[0] == "Search results for 'god':"
+    assert any(line.endswith("core.God") for line in lines)
+
+
+def test_search_command_supports_json_output(capsys: CaptureFixture[str]) -> None:
+    exit_code = main(["search", "core", "--format", "json"])
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    payload = json.loads(captured.out)
+    assert payload["query"] == "core"
+    assert payload["matches"]
+    assert any(item["reference"] == "core.God" for item in payload["matches"])
+
+
+def test_search_command_respects_case_sensitivity(capsys: CaptureFixture[str]) -> None:
+    exit_code = main(["search", "god", "--case-sensitive"])
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "no matches" in captured.out
+
+
 def test_resolve_reference(capsys: CaptureFixture[str]) -> None:
     exit_code = main(["resolve", "core.God"])
     captured = capsys.readouterr()

@@ -136,13 +136,17 @@ core
 
 $ compute-god station marketing --format json
 {
-  "description": "营销漏斗动力学。",
-  "entries": [
-    "FunnelParameters",
-    "marketing_universe",
-    ...
-  ]
+    "description": "营销漏斗动力学。",
+    "entries": [
+      "FunnelParameters",
+      "marketing_universe",
+      ...
+    ]
 }
+
+$ compute-god search god
+Search results for 'god':
+  - core.God
 ```
 
 The CLI output is deterministic, making it perfect for generating documentation snippets or powering editor integrations.
