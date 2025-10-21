@@ -13,7 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from .core import FixpointResult, God, Metric, State, fixpoint, rule
+from compute_god.core import FixpointResult, God, Metric, State, fixpoint, rule
 
 
 @dataclass(frozen=True)

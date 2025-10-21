@@ -27,7 +27,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Mapping, MutableMapping
 
-from .core import FixpointResult, God, Rule, State, Universe, fixpoint, rule
+from compute_god.core import FixpointResult, God, Rule, State, Universe, fixpoint, rule
 
 
 StateMapping = Mapping[str, float]

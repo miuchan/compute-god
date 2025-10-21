@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Iterable, Mapping, MutableMapping, Sequence
 
-from .core import FixpointResult, God, Metric, State, fixpoint, rule
+from compute_god.core import FixpointResult, God, Metric, State, fixpoint, rule
 
 
 CouncilSnapshot = Mapping[str, float]

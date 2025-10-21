@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, Iterable, List, MutableMapping, Optional, Tuple
 
-from .core import ObserverEvent
+from compute_god.core import ObserverEvent
 
 State = MutableMapping[str, object]
 TemperatureMetric = Callable[[State], float]

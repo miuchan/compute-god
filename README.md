@@ -50,7 +50,7 @@ The `compute_god.core` package is the heartbeat of the lab.  It exposes:
 * Observer helpers (`Observer`, `ObserverEvent`, `combine_observers`) to wire telemetry streams.
 
 ### Universe Libraries
-Dozens of universes live in `src/compute_god/`, each capturing a distinct narrative or research theme: `drug_lab` for molecular discovery, `earth_rescue` for planetary strategy, `touhou_project` for folklore-inspired optimisation, and many more.  They all follow the same pattern – a blueprint, a metric, and a `run_*` helper – so explorers can remix them with minimal ceremony.
+Dozens of universes now live inside the dedicated `src/compute_god/domains/` package, each capturing a distinct narrative or research theme: `drug_lab` for molecular discovery, `earth_rescue` for planetary strategy, `touhou_project` for folklore-inspired optimisation, and many more.  They all follow the same pattern – a blueprint, a metric, and a `run_*` helper – so explorers can remix them with minimal ceremony.
 
 ### Observers & Telemetry
 Modules such as `screenshot`, `github_feed`, and `github_offline` translate universe events into tangible artefacts: rendered mockups, mobile-friendly feeds, or offline knowledge bases.  Observers plug directly into the core engine, giving experiments a rich exhaust of data for analysis or storytelling.
@@ -74,7 +74,7 @@ compute-god/
 │   ├── catalogue.py         # Shared blueprint powering the guidance desk
 │   ├── guidance.py          # Station abstractions for catalogue navigation
 │   ├── cli.py               # `compute-god` command line entry points
-│   └── *.py                 # Universe modules and experimental toolkits
+│   └── domains/             # Universe modules and experimental toolkits
 ├── tests/                   # Behavioural and regression tests for every universe
 ├── pyproject.toml           # Build configuration (Python + CLI entry points)
 └── uv.lock                  # Reproducible dependency lock for `uv`

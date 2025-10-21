@@ -14,7 +14,7 @@ from typing import (
     Tuple,
 )
 
-from .core import FixpointResult, God, Observer, RuleContext, State, Universe, fixpoint, rule
+from compute_god.core import FixpointResult, God, Observer, RuleContext, State, Universe, fixpoint, rule
 
 Statement = str
 Premises = Tuple[Statement, ...]

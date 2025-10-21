@@ -45,12 +45,12 @@ from . import guidance_desk as _guidance_desk
 from . import __version__ as _package_version
 
 try:  # pragma: no cover - optional NumPy dependency
-    from .feynman_wormhole_lab import DiagramLeg, Propagator, run_feynman_wormhole_lab
+    from .domains.feynman_wormhole_lab import DiagramLeg, Propagator, run_feynman_wormhole_lab
 except ImportError:  # pragma: no cover - align with lazy import semantics
     DiagramLeg = Propagator = run_feynman_wormhole_lab = None  # type: ignore[assignment]
 
 if TYPE_CHECKING:  # pragma: no cover - imported for typing only
-    from .feynman_wormhole_lab import BridgeSummary
+    from .domains.feynman_wormhole_lab import BridgeSummary
 
 
 def _format_station_text(name: str, description: str, entries: Iterable[str]) -> str:
