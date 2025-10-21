@@ -108,6 +108,13 @@ from .gift import (
     prepare_gift_canvas,
     sculpt_gift_landscape,
 )
+from .earth_online_council import (
+    CouncilAgenda,
+    CouncilMandate,
+    CouncilMember,
+    council_transition,
+    simulate_ai_council,
+)
 from .leshan_buddha import (
     BuddhaSegment,
     DrainageChannel,
