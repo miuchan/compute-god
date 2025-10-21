@@ -33,6 +33,17 @@ _RAW_STATION_BLUEPRINT: tuple[StationLayout, ...] = (
         ),
     ),
     (
+        "information_field",
+        "引导信息能量场中的稳定愉悦梯度下降。",
+        (
+            "EnergyField",
+            "EnergyDescentNavigator",
+            "DescentPath",
+            "DescentStep",
+            "plan_energy_descent",
+        ),
+    ),
+    (
         "landscape",
         "景观高度学习与扩散平衡。",
         (

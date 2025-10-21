@@ -58,6 +58,12 @@ Modules such as `screenshot`, `github_feed`, and `github_offline` translate univ
 ### Guidance & Tooling
 `guidance.py` and the CLI (`compute_god/cli.py`) surface the entire catalogue via a "guidance desk" metaphor.  Stations group related universes, thermal duals, culinary rituals, and more.  The freshly refactored catalogue blueprint ensures these groupings remain consistent across documentation, tests, and sibling runtimes.
 
+The new `information_energy.py` module extends the desk with a companion for
+"information energy" exploration.  It packages a momentum-aware gradient
+descent navigator that tunes each step for stability, delight, and low energy
+consumption so researchers can script smooth descents through their favourite
+landscapes.
+
 ## Repository Layout
 ```
 compute-god/
