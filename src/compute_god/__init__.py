@@ -11,6 +11,18 @@ from typing import Any
 
 from .guidance import DeskStation, GuidanceDesk
 from .catalogue import build_guidance_desk, iter_export_names
+from .happiness_scheduler import (
+    BlockQLearningScheduler,
+    DIMENSIONS,
+    GreedyScheduler,
+    HappinessSimulator,
+    LifeState,
+    ModelParameters,
+    StepResult,
+    default_parameters,
+    default_state,
+    sampler_from_ranges,
+)
 
 from .core import (
     ApplyFn,
