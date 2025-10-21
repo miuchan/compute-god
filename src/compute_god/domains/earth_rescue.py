@@ -23,7 +23,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, Mapping, MutableMapping
 
-from .core import FixpointResult, God, Metric, State, fixpoint, rule
+from compute_god.core import FixpointResult, God, Metric, State, fixpoint, rule
 
 
 PlanetStateMapping = Mapping[str, float]

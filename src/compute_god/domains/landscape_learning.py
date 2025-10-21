@@ -29,7 +29,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable, Mapping, MutableMapping, Sequence, Tuple
 
-from .core import FixpointResult, God, Metric, RuleContext, State, Universe, fixpoint, rule
+from compute_god.core import FixpointResult, God, Metric, RuleContext, State, Universe, fixpoint, rule
 
 Coordinate = Tuple[int, int]
 GridMapping = Mapping[Coordinate, float]

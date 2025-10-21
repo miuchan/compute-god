@@ -9,6 +9,13 @@ import sys
 import tomllib
 from typing import Any
 
+# Extend the package search path so legacy ``compute_god.<module>`` imports keep
+# working after reorganising the code base into dedicated sub-packages.
+package_dir = Path(__file__).resolve().parent
+_DOMAINS_DIR = package_dir / "domains"
+if _DOMAINS_DIR.is_dir():  # pragma: no branch - guarded import path mutation
+    __path__.append(str(_DOMAINS_DIR))
+
 from .guidance import DeskStation, GuidanceDesk
 from .catalogue import build_guidance_desk, iter_export_names
 from .information_energy import (
@@ -50,15 +57,15 @@ from .core import (
     recursive_descent_fixpoint,
     rule,
 )
-from .miyu import MiyuBond, bond_miyu
-from .miuchan import (
+from .domains.miyu import MiyuBond, bond_miyu
+from .domains.miuchan import (
     MiuchanBlueprint,
     bond_miuchan,
     miuchan_metric,
     miuchan_universe,
     run_miuchan_universe,
 )
-from .intelligent_driving_lab import (
+from .domains.intelligent_driving_lab import (
     DrivingCapability,
     DrivingScenario,
     IntelligentDrivingLab,
@@ -70,7 +77,7 @@ from .intelligent_driving_lab import (
     lab_summary_table,
     scenarios_covering_capability,
 )
-from .dongyun import (
+from .domains.dongyun import (
     DongyunBlueprint,
     dongyun_map,
     dongyun_metric,
@@ -78,17 +85,17 @@ from .dongyun import (
     run_dongyun_institute,
     东云研究所,
 )
-from .momo import (
+from .domains.momo import (
     MOMO_KEYS,
     MomoResonanceBlueprint,
     momo_resonance_metric,
     momo_time_universe,
     run_momo_time_harmony,
 )
-from .screenshot import ScreenshotEnvironment, ScreenshotTheme
-from .github_feed import GitHubMobileFeed, IssueActivity, RepositoryCard, github_feed
-from .github_offline import OfflineGitHub, IssueNotFound, RepositoryNotFound, access_github
-from .git_compression import (
+from .domains.screenshot import ScreenshotEnvironment, ScreenshotTheme
+from .domains.github_feed import GitHubMobileFeed, IssueActivity, RepositoryCard, github_feed
+from .domains.github_offline import OfflineGitHub, IssueNotFound, RepositoryNotFound, access_github
+from .domains.git_compression import (
     CompressionAlgorithm,
     CompressionPlan,
     GitObjectProfile,
@@ -96,14 +103,14 @@ from .git_compression import (
     known_compression_algorithms,
     plan_repository_compression,
 )
-from .landscape_learning import (
+from .domains.landscape_learning import (
     LandscapeLearningParameters,
     LandscapeSample,
     initialise_grid,
     landscape_learning_universe,
     learn_landscape,
 )
-from .limit_language import (
+from .domains.limit_language import (
     ComputableFunction,
     DomainSpec,
     LimitApproach,
@@ -112,13 +119,13 @@ from .limit_language import (
     LimitStatement,
     parse_limit_language,
 )
-from .factorio import (
+from .domains.factorio import (
     FactoryBalance,
     FactoryBlueprint,
     FactoryStep,
     Recipe,
 )
-from .gift import (
+from .domains.gift import (
     GiftCoordinate,
     GiftGrid,
     GiftPlan,
@@ -127,14 +134,14 @@ from .gift import (
     prepare_gift_canvas,
     sculpt_gift_landscape,
 )
-from .earth_online_council import (
+from .domains.earth_online_council import (
     CouncilAgenda,
     CouncilMandate,
     CouncilMember,
     council_transition,
     simulate_ai_council,
 )
-from .leshan_buddha import (
+from .domains.leshan_buddha import (
     BuddhaSegment,
     DrainageChannel,
     LeshanBuddhaModel,
@@ -142,13 +149,13 @@ from .leshan_buddha import (
     build_leshan_buddha,
     iter_segment_features,
 )
-from .lehuo_lefo import (
+from .domains.lehuo_lefo import (
     LehuoLefoThermalDual,
     lehuo_lefo_thermal_dual,
     乐活乐佛热对偶,
 )
 try:  # pragma: no cover - optional dependency during import
-    from .self_application_er_epr import (
+    from .domains.self_application_er_epr import (
         bell_state,
         choi_state_from_kraus,
         entanglement_entropy,
@@ -158,14 +165,14 @@ try:  # pragma: no cover - optional dependency during import
     )
 except ImportError:  # pragma: no cover - numpy may be unavailable in minimal installs
     pass
-from .pottery_gallery import (
+from .domains.pottery_gallery import (
     PedestalRow,
     PotteryDisplay,
     PotteryVessel,
     describe_display,
     generate_pottery_display,
 )
-from .live_and_let_live import (
+from .domains.live_and_let_live import (
     LiveAndLetLiveParameters,
     LiveAndLetLiveState,
     DEFAULT_LIVE_AND_LET_LIVE_STATE,
@@ -173,7 +180,7 @@ from .live_and_let_live import (
     run_live_and_let_live,
     让自己活也让别人活,
 )
-from .shulikou import (
+from .domains.shulikou import (
     ShuliKouBlueprint,
     ShuliKouGlyph,
     ShuliKouReading,
@@ -181,13 +188,13 @@ from .shulikou import (
     compose_shuli_channels,
     术力口,
 )
-from .shulikou_cloud_village import (
+from .domains.shulikou_cloud_village import (
     CloudVillageCooperative,
     CooperativeInitiative,
     CooperativeMember,
     build_shulikou_cloud_village,
 )
-from .yin_yang_wu_xing import (
+from .domains.yin_yang_wu_xing import (
     Element,
     Polarity,
     Trigram,
@@ -280,7 +287,7 @@ _register_compat_module(
     God=God,
     Universe=Universe,
 )
-from .bingzi import (
+from .domains.bingzi import (
     Bingzi,
     Mingzi,
     Pingzi,
@@ -297,8 +304,8 @@ from .bingzi import (
     未亮子,
     未明子,
 )
-from .panzi import Panzi, PanziObservation, PanziOrigin, explore_origin, 磐子
-from .jizi import (
+from .domains.panzi import Panzi, PanziObservation, PanziOrigin, explore_origin, 磐子
+from .domains.jizi import (
     Jizi,
     ThermalDual,
     Zijiji,
@@ -310,8 +317,8 @@ from .jizi import (
     热对偶,
     自机子对偶,
 )
-from .eternity_end import EternityEndThermalDual, eternity_end_thermal_dual, 永恒终结热对偶
-from .bingzi import (
+from .domains.eternity_end import EternityEndThermalDual, eternity_end_thermal_dual, 永恒终结热对偶
+from .domains.bingzi import (
     Bingzi,
     Mingzi,
     Pingzi,
@@ -330,7 +337,7 @@ from .bingzi import (
     未亮子,
     未明子,
 )
-from .yuzi import (
+from .domains.yuzi import (
     GridSummary,
     Qizi,
     QiziParameters,
@@ -342,8 +349,8 @@ from .yuzi import (
     琦子,
     量子热对偶,
 )
-from .sanzi import Sanzi, SanziOverview, Weizi, 三子, 维子
-from .siqianzi import (
+from .domains.sanzi import Sanzi, SanziOverview, Weizi, 三子, 维子
+from .domains.siqianzi import (
     Siqianzi,
     SiqianziDualEdge,
     SiqianziDualNode,
@@ -355,7 +362,7 @@ from .siqianzi import (
     死前子网络,
     死前子热对偶网络,
 )
-from .dianfen_changzi import (
+from .domains.dianfen_changzi import (
     StarchSausageEquilibrium,
     StarchSausageNetworkGame,
     StarchSausagePlayer,
@@ -366,16 +373,16 @@ from .dianfen_changzi import (
     淀粉肠子玩家,
     淀粉肠子网络博弈,
 )
-from .jiahao import (
+from .domains.jiahao import (
     JiahaoMaximumThermalDual,
     jiahao_max_thermal_dual,
     jiahao_max_thermal_dual_from_network,
     嘉豪最大热对偶,
 )
-from .yihong import YihongMiyuThermalDual, yihong_miyu_thermal_dual, 一弘美羽热对偶
-from .jiaose import ChromaticDual, Jiaozi, Sezi, chromatic_dual, 角子, 色子, 色角对偶
-from .august import EndlessAugust
-from .abura_soba import (
+from .domains.yihong import YihongMiyuThermalDual, yihong_miyu_thermal_dual, 一弘美羽热对偶
+from .domains.jiaose import ChromaticDual, Jiaozi, Sezi, chromatic_dual, 角子, 色子, 色角对偶
+from .domains.august import EndlessAugust
+from .domains.abura_soba import (
     AburaSobaProfile,
     NoodleCanvas,
     OilLayer,
@@ -384,7 +391,7 @@ from .abura_soba import (
     assemble_abura_soba,
     油そば,
 )
-from .entangle import (
+from .domains.entangle import (
     Chanzi,
     Entangler,
     EntanglementSnapshot,
@@ -393,7 +400,7 @@ from .entangle import (
     缠子,
     纠缠子,
 )
-from .quantum_decoherence import (
+from .domains.quantum_decoherence import (
     KNOWN_QUANTUM_MECHANISMS,
     DecoherenceEnvironment,
     DecoherenceLedger,
@@ -403,7 +410,7 @@ from .quantum_decoherence import (
     decoherence_for_mechanism,
     退相干所有量子机制,
 )
-from .anti_quantum import (
+from .domains.anti_quantum import (
     AntiQuantumAlgorithm,
     AntiQuantumDual,
     QuantumAttackSurface,
@@ -412,10 +419,10 @@ from .anti_quantum import (
     抗量子对偶,
     量子攻击面,
 )
-from .existence import ExistenceWitness, StabilityWitness, 存在子, 稳定子
-from .ctc import ClosedTimelikeCurve, CTCOptimisationResult, optimise_closed_timelike_curve
-from .threshold import ThresholdSpace, ThresholdOptimisationResult, optimise_threshold_space
-from .life import (
+from .domains.existence import ExistenceWitness, StabilityWitness, 存在子, 稳定子
+from .domains.ctc import ClosedTimelikeCurve, CTCOptimisationResult, optimise_closed_timelike_curve
+from .domains.threshold import ThresholdSpace, ThresholdOptimisationResult, optimise_threshold_space
+from .domains.life import (
     LifeLattice,
     LifeOptimisationResult,
     optimise_game_of_life,
@@ -429,16 +436,16 @@ from .life_toolbox import (
     design_hydration_ritual,
     design_meal_landscape,
 )
-from .rule_optimisation import RuleOptimisationResult, optimise_rule_weights
-from .degree_space import DegreeDual, DegreeSpace, DegreeTensor, tensor_product
-from .metaverse import (
+from .domains.rule_optimisation import RuleOptimisationResult, optimise_rule_weights
+from .domains.degree_space import DegreeDual, DegreeSpace, DegreeTensor, tensor_product
+from .domains.metaverse import (
     MetaverseBlueprint,
     bond_metaverse_with_love,
     ideal_metaverse_universe,
     metaverse_metric,
     run_ideal_metaverse,
 )
-from .mihoyo import (
+from .domains.mihoyo import (
     MihoyoStudioBlueprint,
     MiyuCreativeProfile,
     MiyuJoinsMihoyoResult,
@@ -449,32 +456,32 @@ from .mihoyo import (
     miyu_join_mihoyo_universe,
     run_miyu_join_mihoyo,
 )
-from .meta_spacetime import (
+from .domains.meta_spacetime import (
     MetaSpacetimeBlueprint,
     ideal_meta_spacetime_universe,
     meta_spacetime_metric,
     run_meta_spacetime,
 )
-from .complex_dynamics import (
+from .domains.complex_dynamics import (
     ComplexDynamicsBlueprint,
     complex_dynamics_metric,
     design_complex_dynamics_universe,
     run_complex_dynamics,
 )
-from .complex_network import (
+from .domains.complex_network import (
     ComplexNetworkBlueprint,
     complex_network_metric,
     ideal_complex_network_universe,
     run_complex_network,
 )
-from .cooperation_evolution import (
+from .domains.cooperation_evolution import (
     CooperationParameters,
     CooperationState,
     DEFAULT_COOPERATION_STATE,
     evolve_cooperation,
     run_cooperation_evolution,
 )
-from .llm_cooperation import (
+from .domains.llm_cooperation import (
     DEFAULT_LLM_COOPERATION,
     LLMAgentContribution,
     LLMCooperationBlueprint,
@@ -483,7 +490,7 @@ from .llm_cooperation import (
     llm_cooperation_metric,
     run_llm_cooperation,
 )
-from .llm_agent_taxonomy import (
+from .domains.llm_agent_taxonomy import (
     CAPABILITY_KEYS,
     AgentTaskRequirement,
     LLMTypeProfile,
@@ -493,26 +500,26 @@ from .llm_agent_taxonomy import (
     rank_llm_types,
     score_llm_profile,
 )
-from .everything_demonstration import (
+from .domains.everything_demonstration import (
     EverythingDemonstrationBlueprint,
     physical_everything_demonstration_universe,
     physical_everything_metric,
     run_physical_everything_demonstration,
 )
-from .drug_lab import (
+from .domains.drug_lab import (
     DrugLabOptimisationResult,
     drug_lab_metric,
     ideal_drug_lab_universe,
     run_drug_lab,
 )
-from .tianhe import TianheLine, 天和线
-from .catalysis import (
+from .domains.tianhe import TianheLine, 天和线
+from .domains.catalysis import (
     CatalysisOutcome,
     Chanzi,
     Jiuzi,
     catalyse_jiuzi_and_chanzi,
 )
-from .theorem import (
+from .domains.theorem import (
     InferenceRule,
     Proof,
     ProofStep,
@@ -523,7 +530,7 @@ from .theorem import (
     theorem_metric,
     theorem_proving_universe,
 )
-from .elf_usdt import (
+from .domains.elf_usdt import (
     ELFUSDTMarket,
     SwapDirection,
     SwapEvent,
@@ -532,15 +539,15 @@ from .elf_usdt import (
     精灵,
     泰达,
 )
-from .adhd import (
+from .domains.adhd import (
     ADHDProfile,
     ADHDResponse,
     CoefficientOfEngagement,
     StimulusProfile,
     simulate_coe,
 )
-from .logic import Feizi, Ouzi, Ruofei, 非子, 欧子, 若非
-from .xuyueming import (
+from .domains.logic import Feizi, Ouzi, Ruofei, 非子, 欧子, 若非
+from .domains.xuyueming import (
     UprootStep,
     WillowBranch,
     WeepingWillow,
@@ -549,9 +556,9 @@ from .xuyueming import (
     倒拔垂杨柳,
     许月明,
 )
-from .shengbing import ConceptCongruence, 生病全等于放屁
-from .utawarerumono import LegendChant, Utawarerumono, UtawarerumonoChant, 传颂之物
-from .love_wishing_machine import (
+from .domains.shengbing import ConceptCongruence, 生病全等于放屁
+from .domains.utawarerumono import LegendChant, Utawarerumono, UtawarerumonoChant, 传颂之物
+from .domains.love_wishing_machine import (
     WishParameters,
     love_wishing_fixpoint,
     love_wishing_map,
@@ -560,15 +567,15 @@ from .love_wishing_machine import (
     love_wishing_universe,
     wish_granted,
 )
-from .courtship_cohomology import (
+from .domains.courtship_cohomology import (
     CochainSpace,
     CourtshipCochainComplex,
     CourtshipDifferential,
     courtship_cohomology_story,
 )
-from .world import WorldExecutionRequest, world_execute
-from .earth_rescue import EarthState, RescueParameters, rescue_map, save_earth
-from .shuangxiang import (
+from .domains.world import WorldExecutionRequest, world_execute
+from .domains.earth_rescue import EarthState, RescueParameters, rescue_map, save_earth
+from .domains.shuangxiang import (
     BiphasicOptimisationResult,
     BiphasicState,
     continue_biphasic_descent,
@@ -577,7 +584,7 @@ from .shuangxiang import (
     双相梯度下降,
     继续梯度下降,
 )
-from .touhou_project import (
+from .domains.touhou_project import (
     DEFAULT_BLUEPRINT as TOUHOU_DEFAULT_BLUEPRINT,
     ReimuNextSolution,
     TouhouIncidentBlueprint,
@@ -588,7 +595,7 @@ from .touhou_project import (
     touhou_incident_universe,
     博丽灵梦下一解,
 )
-from .vulkan import (
+from .domains.vulkan import (
     DescriptorBinding,
     DescriptorSetLayout,
     RenderAttachment,
@@ -599,7 +606,7 @@ from .vulkan import (
     VulkanValidationError,
     plan_vulkan_pipeline,
 )
-from .s_follow_reading import (
+from .domains.s_follow_reading import (
     DEFAULT_FOLLOW_READING_STATE,
     FollowReadingBlueprint,
     FollowReadingFriendProfile,
@@ -611,6 +618,23 @@ from .s_follow_reading import (
 )
 
 _GUIDANCE_SYMBOLS = dict(locals())
+
+# Maintain backwards compatibility by aliasing restructured modules to their
+# historical ``compute_god.<module>`` import paths.  Without this step Python
+# would load two distinct module objects (``compute_god.<name>`` and
+# ``compute_god.domains.<name>``) leading to isinstance checks failing across
+# boundaries such as the Miyu ecosystem.
+if _DOMAINS_DIR.is_dir():
+    for _module_file in _DOMAINS_DIR.glob("*.py"):
+        if _module_file.name == "__init__.py":
+            continue
+        _module_name = _module_file.stem
+        _domain_qualname = f"{__name__}.domains.{_module_name}"
+        _legacy_qualname = f"{__name__}.{_module_name}"
+        _module = sys.modules.get(_domain_qualname)
+        if _module is not None:
+            sys.modules[_legacy_qualname] = _module
+    del _module_file, _module_name, _domain_qualname, _legacy_qualname, _module
 
 GUIDANCE_DESK = build_guidance_desk(_GUIDANCE_SYMBOLS)
 

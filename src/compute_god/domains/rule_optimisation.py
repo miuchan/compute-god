@@ -26,7 +26,7 @@ import math
 from dataclasses import dataclass
 from typing import Callable, List, Mapping, MutableMapping, Optional, Sequence
 
-from .core import Rule
+from compute_god.core import Rule
 
 NumericState = Mapping[str, object]
 Vector = List[float]

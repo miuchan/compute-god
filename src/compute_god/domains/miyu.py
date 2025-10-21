@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, List, MutableMapping, Optional, Tuple
 
-from .core import Observer, ObserverEvent
+from compute_god.core import Observer, ObserverEvent
 
 State = MutableMapping[str, object]
 Metric = Callable[[State, State], float]
