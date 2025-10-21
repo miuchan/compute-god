@@ -11,6 +11,13 @@ from typing import Any
 
 from .guidance import DeskStation, GuidanceDesk
 from .catalogue import build_guidance_desk, iter_export_names
+from .information_energy import (
+    DescentPath,
+    DescentStep,
+    EnergyDescentNavigator,
+    EnergyField,
+    plan_energy_descent,
+)
 from .happiness_scheduler import (
     BlockQLearningScheduler,
     DIMENSIONS,
@@ -616,6 +623,13 @@ def guidance_desk() -> GuidanceDesk:
 __all__ = list(iter_export_names())
 __all__.extend(["DeskStation", "GuidanceDesk", "GUIDANCE_DESK", "guidance_desk"])
 __all__.extend(["ScreenshotEnvironment", "ScreenshotTheme"])
+__all__.extend([
+    "DescentPath",
+    "DescentStep",
+    "EnergyDescentNavigator",
+    "EnergyField",
+    "plan_energy_descent",
+])
 __all__.extend([
     "GitHubMobileFeed",
     "IssueActivity",
