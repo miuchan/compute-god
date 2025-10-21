@@ -435,6 +435,20 @@ _RAW_STATION_BLUEPRINT: tuple[StationLayout, ...] = (
         ),
     ),
     (
+        "llm_agent_taxonomy",
+        "智能体常用 LLM 类型的能力谱系与编排建议。",
+        (
+            "CAPABILITY_KEYS",
+            "LLMTypeProfile",
+            "LLM_TYPE_PROFILES",
+            "iter_llm_type_profiles",
+            "AgentTaskRequirement",
+            "score_llm_profile",
+            "rank_llm_types",
+            "compose_llm_stack",
+        ),
+    ),
+    (
         "s_follow_reading",
         "S跟读学习朋友合作网络的协作推进规则。",
         (

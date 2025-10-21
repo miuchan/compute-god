@@ -464,6 +464,16 @@ from .llm_cooperation import (
     llm_cooperation_metric,
     run_llm_cooperation,
 )
+from .llm_agent_taxonomy import (
+    CAPABILITY_KEYS,
+    AgentTaskRequirement,
+    LLMTypeProfile,
+    LLM_TYPE_PROFILES,
+    compose_llm_stack,
+    iter_llm_type_profiles,
+    rank_llm_types,
+    score_llm_profile,
+)
 from .everything_demonstration import (
     EverythingDemonstrationBlueprint,
     physical_everything_demonstration_universe,
