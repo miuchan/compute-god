@@ -96,6 +96,26 @@ def test_version_command_outputs_package_version(capsys: CaptureFixture[str]) ->
     assert captured.out.strip() == _read_version()
 
 
+def test_snapshot_command_outputs_markdown(capsys: CaptureFixture[str]) -> None:
+    exit_code = main(["snapshot"])
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert captured.out.startswith("# Compute-God Station Catalogue\n\n## ")
+    assert "- `God`" in captured.out
+
+
+def test_snapshot_command_writes_html(tmp_path: Path, capsys: CaptureFixture[str]) -> None:
+    output_path = tmp_path / "catalogue.html"
+    exit_code = main(["snapshot", "--format", "html", "--output", str(output_path)])
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert captured.out == ""
+    content = output_path.read_text(encoding="utf-8")
+    assert "<!DOCTYPE html>" in content
+    assert "<section class=\"station\"" in content
+    assert "<code>God</code>" in content
+
+
 def test_wormhole_lab_cli_generates_json(tmp_path: Path, capsys: CaptureFixture[str]) -> None:
     np = pytest.importorskip("numpy")
 

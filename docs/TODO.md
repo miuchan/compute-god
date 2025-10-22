@@ -9,7 +9,7 @@ A living checklist derived from the architecture blueprint in [README.md](../REA
 ## 🚧 In Progress
 - [ ] Document the TypeScript runtime parity layer and note any API gaps compared to the Python engine.
 - [ ] Add narrative-driven tutorials that walk through building a custom universe from blueprint to observer wiring.
-- [ ] Automate catalogue snapshot generation for the documentation vault (HTML/Markdown) using `compute-god stations --format json`.
+- [x] Automate catalogue snapshot generation for the documentation vault (HTML/Markdown) using `compute-god stations --format json`.
 
 ## 🧭 Exploration Backlog
 - [ ] Establish cross-repository integration tests that import the shared catalogue in downstream projects.
