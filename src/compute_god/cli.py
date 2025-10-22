@@ -39,6 +39,7 @@ import json
 from pathlib import Path
 import sys
 from collections.abc import Iterable, Mapping
+from html import escape
 from typing import TYPE_CHECKING
 
 from . import guidance_desk as _guidance_desk
@@ -303,6 +304,84 @@ def _handle_wormhole_lab(args: argparse.Namespace) -> int:
     return 0
 
 
+def _snapshot_rows() -> list[tuple[str, str, tuple[str, ...]]]:
+    desk = _guidance_desk()
+    rows: list[tuple[str, str, tuple[str, ...]]] = []
+    for name, station in desk.items():
+        rows.append((name, station.description, tuple(station.catalog())))
+    return rows
+
+
+def _format_snapshot_markdown(rows: Iterable[tuple[str, str, tuple[str, ...]]]) -> str:
+    lines = ["# Compute-God Station Catalogue"]
+    for name, description, entries in rows:
+        lines.append("")
+        lines.append(f"## {name}")
+        if description:
+            lines.append("")
+            lines.append(description)
+        if entries:
+            lines.append("")
+            for entry in entries:
+                lines.append(f"- `{entry}`")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def _format_snapshot_html(rows: Iterable[tuple[str, str, tuple[str, ...]]]) -> str:
+    lines = [
+        "<!DOCTYPE html>",
+        "<html lang=\"en\">",
+        "<head>",
+        "  <meta charset=\"utf-8\" />",
+        "  <title>Compute-God Station Catalogue</title>",
+        "</head>",
+        "<body>",
+        "  <main class=\"catalogue\">",
+    ]
+    for name, description, entries in rows:
+        lines.append(f"    <section class=\"station\" id=\"{escape(name)}\">")
+        lines.append(f"      <h2>{escape(name)}</h2>")
+        if description:
+            lines.append(f"      <p>{escape(description)}</p>")
+        if entries:
+            lines.append("      <ul>")
+            for entry in entries:
+                lines.append(f"        <li><code>{escape(entry)}</code></li>")
+            lines.append("      </ul>")
+        lines.append("    </section>")
+    lines.extend([
+        "  </main>",
+        "</body>",
+        "</html>",
+    ])
+    return "\n".join(lines) + "\n"
+
+
+def _handle_snapshot(args: argparse.Namespace) -> int:
+    rows = _snapshot_rows()
+    if args.format == "json":
+        payload = {
+            name: _station_payload(description, entries)
+            for name, description, entries in rows
+        }
+        rendered = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    elif args.format == "html":
+        rendered = _format_snapshot_html(rows)
+    else:
+        rendered = _format_snapshot_markdown(rows)
+
+    output: str | None = getattr(args, "output", None)
+    if output:
+        Path(output).write_text(rendered, encoding="utf-8")
+        return 0
+
+    if not rendered.endswith("\n"):
+        rendered += "\n"
+    sys.stdout.write(rendered)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Return the top-level CLI argument parser."""
 
@@ -373,6 +452,22 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output format for the bridge summary.",
     )
     wormhole_parser.set_defaults(handler=_handle_wormhole_lab)
+
+    snapshot_parser = subparsers.add_parser(
+        "snapshot",
+        help="Generate catalogue snapshots for documentation pipelines.",
+    )
+    snapshot_parser.add_argument(
+        "--format",
+        choices=("markdown", "html", "json"),
+        default="markdown",
+        help="Snapshot output format.",
+    )
+    snapshot_parser.add_argument(
+        "--output",
+        help="Optional path to write the snapshot to instead of stdout.",
+    )
+    snapshot_parser.set_defaults(handler=_handle_snapshot)
 
     return parser
 

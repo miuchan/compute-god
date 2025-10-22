@@ -153,6 +153,9 @@ $ compute-god station marketing --format json
 $ compute-god search god
 Search results for 'god':
   - core.God
+
+$ compute-god snapshot --format markdown --output docs/catalogue.md
+(writes a Markdown snapshot of every station for the documentation vault)
 ```
 
 The CLI output is deterministic, making it perfect for generating documentation snippets or powering editor integrations.
