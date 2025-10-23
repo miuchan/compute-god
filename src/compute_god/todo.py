@@ -41,6 +41,20 @@ class TodoStatus(StrEnum):
         return self is TodoStatus.COMPLETED
 
 
+class TodoPriority(StrEnum):
+    """Relative urgency for a todo entry."""
+
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+    @property
+    def weight(self) -> int:
+        """Numerical weight used when ordering tasks."""
+
+        return {self.LOW: 0, self.MEDIUM: 1, self.HIGH: 2}[self]
+
+
 def _ensure_utc(value: datetime | None) -> datetime | None:
     if value is None:
         return None
@@ -71,6 +85,7 @@ class TodoItem:
     status: TodoStatus = TodoStatus.PENDING
     due_at: datetime | None = None
     tags: tuple[str, ...] = ()
+    priority: TodoPriority = TodoPriority.MEDIUM
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     started_at: datetime | None = None
@@ -119,6 +134,9 @@ class TodoItem:
     def with_due_date(self, due_at: datetime | None) -> Self:
         return replace(self, due_at=_ensure_utc(due_at), updated_at=datetime.now(UTC))
 
+    def with_priority(self, priority: TodoPriority) -> Self:
+        return replace(self, priority=priority, updated_at=datetime.now(UTC))
+
     def to_payload(self) -> Mapping[str, object]:
         return {
             "id": str(self.identifier),
@@ -127,6 +145,7 @@ class TodoItem:
             "status": self.status.value,
             "due_at": self.due_at.isoformat() if self.due_at else None,
             "tags": list(self.tags),
+            "priority": self.priority.value,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
             "started_at": self.started_at.isoformat() if self.started_at else None,
@@ -161,8 +180,15 @@ class TodoList:
         *,
         due_at: datetime | None = None,
         tags: Iterable[str] = (),
+        priority: TodoPriority = TodoPriority.MEDIUM,
     ) -> TodoItem:
-        item = TodoItem(title=title, description=description, due_at=due_at, tags=tuple(tags))
+        item = TodoItem(
+            title=title,
+            description=description,
+            due_at=due_at,
+            tags=tuple(tags),
+            priority=priority,
+        )
         self._items[item.identifier] = item
         return item
 
@@ -211,6 +237,12 @@ class TodoList:
         self._items[identifier] = updated
         return updated
 
+    def update_priority(self, identifier: UUID, priority: TodoPriority) -> TodoItem:
+        item = self._items[identifier]
+        updated = item.with_priority(priority)
+        self._items[identifier] = updated
+        return updated
+
     def remove(self, identifier: UUID) -> TodoItem:
         return self._items.pop(identifier)
 
@@ -219,6 +251,7 @@ class TodoList:
         *,
         status: TodoStatus | None = None,
         tag: str | None = None,
+        priority: TodoPriority | None = None,
     ) -> tuple[TodoItem, ...]:
         results = []
         lowered_tag = tag.lower().strip() if tag is not None else None
@@ -226,6 +259,8 @@ class TodoList:
             if status is not None and item.status is not status:
                 continue
             if lowered_tag is not None and lowered_tag not in item.tags:
+                continue
+            if priority is not None and item.priority is not priority:
                 continue
             results.append(item)
         return tuple(results)
@@ -255,4 +290,27 @@ class TodoList:
 
     def export(self) -> tuple[Mapping[str, object], ...]:
         return tuple(item.to_payload() for item in self._items.values())
+
+    def prioritised(
+        self,
+        *,
+        include_completed: bool = False,
+    ) -> tuple[TodoItem, ...]:
+        """Return tasks ordered by urgency for focused backlogs."""
+
+        def sort_key(item: TodoItem) -> tuple[bool, int, datetime, datetime]:
+            due_at = item.due_at or datetime.max.replace(tzinfo=UTC)
+            return (
+                item.status.is_completed,
+                -item.priority.weight,
+                due_at,
+                item.created_at,
+            )
+
+        candidates = (
+            item
+            for item in self._items.values()
+            if include_completed or not item.status.is_completed
+        )
+        return tuple(sorted(candidates, key=sort_key))
 

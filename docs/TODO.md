@@ -5,6 +5,7 @@ A living checklist derived from the architecture blueprint in [README.md](../REA
 ## ✅ Completed
 - [x] Centralise the guidance desk blueprint inside `compute_god.catalogue` and share it with documentation/CLI consumers.
 - [x] Refresh the top-level README with an interoperability-first project overview and repository layout guide.
+- [x] Teach the modern todo engine to understand priority tiers and surface urgency-ordered backlog snapshots for documentation work.
 
 ## 🚧 In Progress
 - [ ] Document the TypeScript runtime parity layer and note any API gaps compared to the Python engine.

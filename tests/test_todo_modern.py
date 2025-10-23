@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 
-from compute_god.todo import TodoList, TodoStatus
+from compute_god.todo import TodoList, TodoStatus, TodoPriority
 
 
 def test_todo_add_and_complete_roundtrip() -> None:
@@ -31,6 +31,7 @@ def test_todo_add_and_complete_roundtrip() -> None:
     exported = todo.export()
     assert exported[0]["status"] == TodoStatus.COMPLETED.value
     assert exported[0]["tags"] == ["dev", "backend"]
+    assert exported[0]["priority"] == TodoPriority.MEDIUM.value
 
 
 def test_todo_statistics_and_filters() -> None:
@@ -55,19 +56,47 @@ def test_todo_statistics_and_filters() -> None:
     pending_tasks = todo.query(status=TodoStatus.PENDING)
     assert tuple(task.identifier for task in pending_tasks) == (qa.identifier,)
 
+    high_priority = todo.query(priority=TodoPriority.HIGH)
+    assert high_priority == ()
+
 
 def test_todo_overdue_detection_and_mutators() -> None:
     todo = TodoList()
     now = datetime.now(UTC)
-    late = todo.add("Fix regression", due_at=now - timedelta(hours=2), tags=("bugfix",))
-    future = todo.add("Plan roadmap", due_at=now + timedelta(days=1))
+    late = todo.add(
+        "Fix regression",
+        due_at=now - timedelta(hours=2),
+        tags=("bugfix",),
+        priority=TodoPriority.HIGH,
+    )
+    future = todo.add(
+        "Plan roadmap",
+        due_at=now + timedelta(days=1),
+        priority=TodoPriority.LOW,
+    )
+    triage = todo.add(
+        "Write retrospective",
+        due_at=now + timedelta(hours=8),
+        priority=TodoPriority.MEDIUM,
+    )
 
     todo.update_tags(future.identifier, ("planning", "roadmap"))
     todo.update_due_date(future.identifier, now + timedelta(days=2))
+    todo.update_priority(future.identifier, TodoPriority.MEDIUM)
 
     overdue = todo.overdue(reference_time=now)
     assert overdue == (late,)
 
     todo.mark_completed(late.identifier)
     assert todo.overdue(reference_time=now) == ()
+
+    backlog = todo.prioritised()
+    assert tuple(item.identifier for item in backlog) == (
+        triage.identifier,
+        future.identifier,
+    )
+
+    backlog_all = todo.prioritised(include_completed=True)
+    assert backlog_all[0].identifier == triage.identifier
+    assert backlog_all[-1].identifier == late.identifier
 
