@@ -156,6 +156,9 @@ Search results for 'god':
 
 $ compute-god snapshot --format markdown --output docs/catalogue.md
 (writes a Markdown snapshot of every station for the documentation vault)
+
+$ compute-god topos --format json
+(renders a deterministic radial map of stations and entries for visual tooling)
 ```
 
 The CLI output is deterministic, making it perfect for generating documentation snippets or powering editor integrations.
