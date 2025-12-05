@@ -25,6 +25,13 @@ from .information_energy import (
     EnergyField,
     plan_energy_descent,
 )
+from .topos import (
+    ToposEdge,
+    ToposMap,
+    ToposNode,
+    build_topos_map,
+    format_topos_text,
+)
 from .happiness_scheduler import (
     BlockQLearningScheduler,
     DIMENSIONS,
@@ -653,6 +660,13 @@ __all__.extend([
     "EnergyDescentNavigator",
     "EnergyField",
     "plan_energy_descent",
+])
+__all__.extend([
+    "ToposEdge",
+    "ToposMap",
+    "ToposNode",
+    "build_topos_map",
+    "format_topos_text",
 ])
 __all__.extend([
     "GitHubMobileFeed",

@@ -44,6 +44,7 @@ from typing import TYPE_CHECKING
 
 from . import guidance_desk as _guidance_desk
 from . import __version__ as _package_version
+from .topos import build_topos_map, format_topos_text
 
 try:  # pragma: no cover - optional NumPy dependency
     from .domains.feynman_wormhole_lab import DiagramLeg, Propagator, run_feynman_wormhole_lab
@@ -358,6 +359,24 @@ def _format_snapshot_html(rows: Iterable[tuple[str, str, tuple[str, ...]]]) -> s
     return "\n".join(lines) + "\n"
 
 
+def _handle_topos(args: argparse.Namespace) -> int:
+    topos_map = build_topos_map()
+    if args.format == "json":
+        rendered = json.dumps(topos_map.to_payload(), ensure_ascii=False, indent=2) + "\n"
+    else:
+        rendered = format_topos_text(topos_map)
+
+    output: str | None = getattr(args, "output", None)
+    if output:
+        Path(output).write_text(rendered, encoding="utf-8")
+        return 0
+
+    if not rendered.endswith("\n"):
+        rendered += "\n"
+    sys.stdout.write(rendered)
+    return 0
+
+
 def _handle_snapshot(args: argparse.Namespace) -> int:
     rows = _snapshot_rows()
     if args.format == "json":
@@ -452,6 +471,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output format for the bridge summary.",
     )
     wormhole_parser.set_defaults(handler=_handle_wormhole_lab)
+
+    topos_parser = subparsers.add_parser(
+        "topos", help="Project the catalogue onto a radial topos map."
+    )
+    topos_parser.add_argument(
+        "--format",
+        choices=("text", "json"),
+        default="text",
+        help="Output format.",
+    )
+    topos_parser.add_argument(
+        "--output",
+        help="Optional path to write the projection to instead of stdout.",
+    )
+    topos_parser.set_defaults(handler=_handle_topos)
 
     snapshot_parser = subparsers.add_parser(
         "snapshot",
